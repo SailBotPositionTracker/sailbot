@@ -1,0 +1,466 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CEA3B07321E6ABEE00E827E9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA3B07221E6ABEE00E827E9 /* AppDelegate.swift */; };
+		CEA3B07521E6ABEE00E827E9 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA3B07421E6ABEE00E827E9 /* ViewController.swift */; };
+		CEA3B07821E6ABEE00E827E9 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEA3B07621E6ABEE00E827E9 /* Main.storyboard */; };
+		CEA3B07A21E6ABF300E827E9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEA3B07921E6ABF300E827E9 /* Assets.xcassets */; };
+		CEA3B07D21E6ABF300E827E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEA3B07B21E6ABF300E827E9 /* LaunchScreen.storyboard */; };
+		CEA3B08821E6ABF300E827E9 /* SailboatPositionTrackerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA3B08721E6ABF300E827E9 /* SailboatPositionTrackerTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CEA3B08421E6ABF300E827E9 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CEA3B06721E6ABED00E827E9 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CEA3B06E21E6ABED00E827E9;
+			remoteInfo = SailboatPositionTracker;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		CEA3B06F21E6ABEE00E827E9 /* SailboatPositionTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SailboatPositionTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEA3B07221E6ABEE00E827E9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		CEA3B07421E6ABEE00E827E9 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		CEA3B07721E6ABEE00E827E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		CEA3B07921E6ABF300E827E9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CEA3B07C21E6ABF300E827E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		CEA3B07E21E6ABF300E827E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CEA3B08321E6ABF300E827E9 /* SailboatPositionTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SailboatPositionTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		CEA3B08721E6ABF300E827E9 /* SailboatPositionTrackerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SailboatPositionTrackerTests.swift; sourceTree = "<group>"; };
+		CEA3B08921E6ABF300E827E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CEA3B06C21E6ABED00E827E9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEA3B08021E6ABF300E827E9 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CEA3B06621E6ABED00E827E9 = {
+			isa = PBXGroup;
+			children = (
+				CEA3B07121E6ABEE00E827E9 /* SailboatPositionTracker */,
+				CEA3B08621E6ABF300E827E9 /* SailboatPositionTrackerTests */,
+				CEA3B07021E6ABEE00E827E9 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CEA3B07021E6ABEE00E827E9 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CEA3B06F21E6ABEE00E827E9 /* SailboatPositionTracker.app */,
+				CEA3B08321E6ABF300E827E9 /* SailboatPositionTrackerTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CEA3B07121E6ABEE00E827E9 /* SailboatPositionTracker */ = {
+			isa = PBXGroup;
+			children = (
+				CEA3B07221E6ABEE00E827E9 /* AppDelegate.swift */,
+				CEA3B07421E6ABEE00E827E9 /* ViewController.swift */,
+				CEA3B07621E6ABEE00E827E9 /* Main.storyboard */,
+				CEA3B07921E6ABF300E827E9 /* Assets.xcassets */,
+				CEA3B07B21E6ABF300E827E9 /* LaunchScreen.storyboard */,
+				CEA3B07E21E6ABF300E827E9 /* Info.plist */,
+			);
+			path = SailboatPositionTracker;
+			sourceTree = "<group>";
+		};
+		CEA3B08621E6ABF300E827E9 /* SailboatPositionTrackerTests */ = {
+			isa = PBXGroup;
+			children = (
+				CEA3B08721E6ABF300E827E9 /* SailboatPositionTrackerTests.swift */,
+				CEA3B08921E6ABF300E827E9 /* Info.plist */,
+			);
+			path = SailboatPositionTrackerTests;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CEA3B06E21E6ABED00E827E9 /* SailboatPositionTracker */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEA3B08C21E6ABF300E827E9 /* Build configuration list for PBXNativeTarget "SailboatPositionTracker" */;
+			buildPhases = (
+				CEA3B06B21E6ABED00E827E9 /* Sources */,
+				CEA3B06C21E6ABED00E827E9 /* Frameworks */,
+				CEA3B06D21E6ABED00E827E9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SailboatPositionTracker;
+			productName = SailboatPositionTracker;
+			productReference = CEA3B06F21E6ABEE00E827E9 /* SailboatPositionTracker.app */;
+			productType = "com.apple.product-type.application";
+		};
+		CEA3B08221E6ABF300E827E9 /* SailboatPositionTrackerTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CEA3B08F21E6ABF300E827E9 /* Build configuration list for PBXNativeTarget "SailboatPositionTrackerTests" */;
+			buildPhases = (
+				CEA3B07F21E6ABF300E827E9 /* Sources */,
+				CEA3B08021E6ABF300E827E9 /* Frameworks */,
+				CEA3B08121E6ABF300E827E9 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				CEA3B08521E6ABF300E827E9 /* PBXTargetDependency */,
+			);
+			name = SailboatPositionTrackerTests;
+			productName = SailboatPositionTrackerTests;
+			productReference = CEA3B08321E6ABF300E827E9 /* SailboatPositionTrackerTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CEA3B06721E6ABED00E827E9 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1010;
+				LastUpgradeCheck = 1010;
+				ORGANIZATIONNAME = TuftsSP2019;
+				TargetAttributes = {
+					CEA3B06E21E6ABED00E827E9 = {
+						CreatedOnToolsVersion = 10.1;
+					};
+					CEA3B08221E6ABF300E827E9 = {
+						CreatedOnToolsVersion = 10.1;
+						TestTargetID = CEA3B06E21E6ABED00E827E9;
+					};
+				};
+			};
+			buildConfigurationList = CEA3B06A21E6ABED00E827E9 /* Build configuration list for PBXProject "SailboatPositionTracker" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = CEA3B06621E6ABED00E827E9;
+			productRefGroup = CEA3B07021E6ABEE00E827E9 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CEA3B06E21E6ABED00E827E9 /* SailboatPositionTracker */,
+				CEA3B08221E6ABF300E827E9 /* SailboatPositionTrackerTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CEA3B06D21E6ABED00E827E9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEA3B07D21E6ABF300E827E9 /* LaunchScreen.storyboard in Resources */,
+				CEA3B07A21E6ABF300E827E9 /* Assets.xcassets in Resources */,
+				CEA3B07821E6ABEE00E827E9 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEA3B08121E6ABF300E827E9 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CEA3B06B21E6ABED00E827E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEA3B07521E6ABEE00E827E9 /* ViewController.swift in Sources */,
+				CEA3B07321E6ABEE00E827E9 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CEA3B07F21E6ABF300E827E9 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CEA3B08821E6ABF300E827E9 /* SailboatPositionTrackerTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		CEA3B08521E6ABF300E827E9 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CEA3B06E21E6ABED00E827E9 /* SailboatPositionTracker */;
+			targetProxy = CEA3B08421E6ABF300E827E9 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		CEA3B07621E6ABEE00E827E9 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CEA3B07721E6ABEE00E827E9 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		CEA3B07B21E6ABF300E827E9 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CEA3B07C21E6ABF300E827E9 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CEA3B08A21E6ABF300E827E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		CEA3B08B21E6ABF300E827E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		CEA3B08D21E6ABF300E827E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = SailboatPositionTracker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.SailboatPositionTracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CEA3B08E21E6ABF300E827E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = SailboatPositionTracker/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.SailboatPositionTracker;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CEA3B09021E6ABF300E827E9 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = SailboatPositionTrackerTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.SailboatPositionTrackerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SailboatPositionTracker.app/SailboatPositionTracker";
+			};
+			name = Debug;
+		};
+		CEA3B09121E6ABF300E827E9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = SailboatPositionTrackerTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.example.SailboatPositionTrackerTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 4.2;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/SailboatPositionTracker.app/SailboatPositionTracker";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CEA3B06A21E6ABED00E827E9 /* Build configuration list for PBXProject "SailboatPositionTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEA3B08A21E6ABF300E827E9 /* Debug */,
+				CEA3B08B21E6ABF300E827E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEA3B08C21E6ABF300E827E9 /* Build configuration list for PBXNativeTarget "SailboatPositionTracker" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEA3B08D21E6ABF300E827E9 /* Debug */,
+				CEA3B08E21E6ABF300E827E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CEA3B08F21E6ABF300E827E9 /* Build configuration list for PBXNativeTarget "SailboatPositionTrackerTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CEA3B09021E6ABF300E827E9 /* Debug */,
+				CEA3B09121E6ABF300E827E9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CEA3B06721E6ABED00E827E9 /* Project object */;
+}
