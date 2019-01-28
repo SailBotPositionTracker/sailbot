@@ -8,6 +8,10 @@
 
 import Foundation
 
+enum PositionError: Error {
+    case InvalidStringFormat
+}
+
 class Position {
     var GPST: Double;
     var lat: Double;
@@ -25,12 +29,17 @@ class Position {
         self.lon = lon
         self.height = height
     }
-    init (RTKLIBString: String) {
+    
+    init (RTKLIBString: String) throws {
         let cols = RTKLIBString.components(separatedBy: " ")
-        self.GPST = cols[1]
-        self.lat = cols[2]
-        self.lon = cols[3]
-        self.height = cols[4]
+        //check for standard RTKLIB format length
+        if (cols.count != 15) {
+            throw PositionError.InvalidStringFormat
+        }
+        self.GPST = Double(cols[1])!
+        self.lat = Double(cols[2])!
+        self.lon = Double(cols[3])!
+        self.height = Double(cols[4])!
     }
     
     func getGPST() -> Double {
