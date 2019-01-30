@@ -9,7 +9,9 @@
 import UIKit
 import SwiftSocket
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, UITableViewDataSource {
+    @IBOutlet weak var tableView: UITableView!
+    private var data: [String] = []
     
     var timerLength: Int = 300
     var seconds: Int = 0
@@ -20,6 +22,29 @@ class ViewController: UIViewController {
     
     //map from TCP connection identifier to Sailboat object
     var fleetMap = [String: Sailboat]()
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return data.count
+    }
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cellReuseIdentifier")! //1.
+        
+        let text = data[indexPath.row] //2.
+        
+        cell.textLabel?.text = text //3.
+        
+        return cell //4.
+    }
+    
+    
+    
+    
+    
+    
+
     
     @IBAction func startButtonTapped(_ sender: UIButton) {
         print("Start button tapped")
@@ -56,6 +81,7 @@ class ViewController: UIViewController {
     }
     
     func calcDistanceToLine(sailboat: Sailboat) -> Double {
+        /*
         let pos_sail = sailboat.getPosition()
         let lat_sail = pos_sail.getLat()
         let lon_sail = pos_sail.getLon()
@@ -69,16 +95,29 @@ class ViewController: UIViewController {
         let num = ((lat_sail - lat_comm) * (lon_pin - lon_comm) - (lon_sail - lon_comm) * (lat_pin - lat_comm))
         let den = sqrt(pow((lat_pin - lat_comm), 2) + pow((lon_pin - lon_comm), 2))
         return num / den
+        */
+        
+        //if relative to the committee boat
+        let pos_sail = sailboat.getPosition()
+        let n_sail = pos_sail.getLat()
+        let e_sail = pos_sail.getLon()
+        let pos_pin = self.fleetMap["192.168.4.2:5000"]!.getPosition()
+        let n_pin = pos_pin.getLat()
+        let e_pin = pos_pin.getLon()
+        return ((n_sail * e_pin) - (e_sail * n_pin)) / sqrt(pow(n_pin, 2) + pow(e_pin, 2))
     }
     
     // Do any additional setup after loading the view, typically from a nib.
     override func viewDidLoad() {
         super.viewDidLoad()
+        for i in 0...1000 {
+            data.append("\(i)")
+        }
+        tableView.dataSource = self
         //Initialize the timer to "full"
         seconds = timerLength
         
         //TODO: hard-coded pin and comm boat for testing
-        self.fleetMap["192.168.4.1:5000"] = Sailboat(id: "comm", pos: Position(GPST: 1.0, lat: 0.0, lon: 0.0, height: 0.0))
         self.fleetMap["192.168.4.2:5000"] = Sailboat(id: "pin", pos: Position(GPST: 1.0, lat: 5.0, lon: 5.0, height: 0.0))
         //init the timer label
         timerLabel.text = timeString(time: TimeInterval(seconds))
