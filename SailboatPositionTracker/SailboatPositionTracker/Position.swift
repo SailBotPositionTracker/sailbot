@@ -14,20 +14,20 @@ enum PositionError: Error {
 
 class Position {
     var GPST: Double;
-    var lat: Double;
-    var lon: Double;
-    var height: Double;
+    var n: Double;
+    var e: Double;
+    var u: Double;
     init() {
         GPST = 0
-        lat = 0
-        lon = 0
-        height = 0
+        n = 0
+        e = 0
+        u = 0
     }
-    init (GPST: Double, lat: Double, lon: Double, height: Double) {
+    init (GPST: Double, n: Double, e: Double, u: Double) {
         self.GPST = GPST
-        self.lat = lat
-        self.lon = lon
-        self.height = height
+        self.n = n
+        self.e = e
+        self.u = u
     }
     
     init (RTKLIBString: String) throws {
@@ -37,9 +37,9 @@ class Position {
             throw PositionError.InvalidStringFormat
         }
         self.GPST = Double(cols[1])!
-        self.lat = Double(cols[2])!
-        self.lon = Double(cols[3])!
-        self.height = Double(cols[4])!
+        self.n = Double(cols[2])!
+        self.e = Double(cols[3])!
+        self.u = Double(cols[4])!
     }
     
     func getGPST() -> Double {
@@ -50,27 +50,27 @@ class Position {
         self.GPST = GPST
     }
     
-    func getLat() -> Double {
-        return self.lat
+    func getN() -> Double {
+        return self.n
     }
     
-    func setLat(lat: Double) {
-        self.lat = lat
+    func setN(n: Double) {
+        self.n = n
     }
     
-    func getLon() -> Double {
-        return self.lon
+    func getE() -> Double {
+        return self.e
     }
     
-    func setLon(lon: Double) {
-        self.lon = lon
+    func setE(e: Double) {
+        self.e = e
     }
     
-    func getHeight() -> Double {
-        return self.height
+    func getU() -> Double {
+        return self.u
     }
     
-    func setHeight(height: Double) {
-        self.height = height
+    func setU(u: Double) {
+        self.u = u
     }
 }

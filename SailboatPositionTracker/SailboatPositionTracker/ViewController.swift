@@ -11,13 +11,12 @@ import SwiftSocket
 
 class ViewController: UIViewController, UITableViewDataSource {
     @IBOutlet weak var tableView: UITableView!
-    private var data: [String] = []
+    private var tableMap = [String: String]()
     
     var timerLength: Int = 300
     var seconds: Int = 0
     var timer: Timer = Timer()
     var isTimerRunning: Bool = false
-    
     @IBOutlet weak var timerLabel: UILabel!
     
     //map from TCP connection identifier to Sailboat object
@@ -27,34 +26,23 @@ class ViewController: UIViewController, UITableViewDataSource {
         return 1
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        let data = Array(tableMap.values)
         return data.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellReuseIdentifier")! //1.
-        
-        let text = data[indexPath.row] //2.
-        
-        cell.textLabel?.text = text //3.
-        
-        return cell //4.
+        let data = Array(tableMap.values)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cellReuseIdentifier")!
+        cell.textLabel?.text = data[indexPath.row]
+        return cell
     }
     
-    
-    
-    
-    
-    
-
-    
     @IBAction func startButtonTapped(_ sender: UIButton) {
-        print("Start button tapped")
         if !isTimerRunning {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
-            isTimerRunning = true;
         } else {
             timer.invalidate()
-            isTimerRunning = false;
         }
+        isTimerRunning = !isTimerRunning
     }
     
     @IBAction func resetButtonTapped(_ sender: UIButton) {
@@ -67,7 +55,6 @@ class ViewController: UIViewController, UITableViewDataSource {
     @objc func updateTimer() {
         if seconds < 1 {
             timer.invalidate()
-            //Send alert to indicate "time's up!"
         } else {
             seconds -= 1
             timerLabel.text = timeString(time: TimeInterval(seconds))
@@ -75,101 +62,107 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     func timeString(time:TimeInterval) -> String {
-        let minutes = Int(time) / 60 % 60
-        let seconds = Int(time) % 60
-        return String(format:"%01i:%02i", minutes, seconds)
+        let min = Int(time) / 60 % 60
+        let sec = Int(time) % 60
+        return String(format:"%01i:%02i", min, sec)
     }
     
     func calcDistanceToLine(sailboat: Sailboat) -> Double {
+        //TODO: reference the boat and pin trackers in a more scalable and concrete way
+        //using positions of both pin and committee boat
         /*
         let pos_sail = sailboat.getPosition()
-        let lat_sail = pos_sail.getLat()
-        let lon_sail = pos_sail.getLon()
-        //TODO: reference the boat and pin trackers in a more scalable and concrete way
+        let n_sail = pos_sail.getN()
+        let e_sail = pos_sail.getE()
         let pos_comm = self.fleetMap["192.168.4.1:5000"]!.getPosition()
-        let lat_comm = pos_comm.getLat()
-        let lon_comm = pos_comm.getLon()
+        let n_comm = pos_comm.getN()
+        let e_comm = pos_comm.getE()
         let pos_pin = self.fleetMap["192.168.4.2:5000"]!.getPosition()
-        let lat_pin = pos_pin.getLat()
-        let lon_pin = pos_pin.getLon()
-        let num = ((lat_sail - lat_comm) * (lon_pin - lon_comm) - (lon_sail - lon_comm) * (lat_pin - lat_comm))
-        let den = sqrt(pow((lat_pin - lat_comm), 2) + pow((lon_pin - lon_comm), 2))
+        let n_pin = pos_pin.getN()
+        let e_pin = pos_pin.getE()
+        let num = ((n_sail - n_comm) * (e_pin - e_comm) - (e_sail - e_comm) * (n_pin - n_comm))
+        let den = sqrt(pow((n_pin - n_comm), 2) + pow((e_pin - e_comm), 2))
         return num / den
         */
         
-        //if relative to the committee boat
+        //if relative to the committee boat (assuming base tracker is at (0, 0) at line boat end)
         let pos_sail = sailboat.getPosition()
-        let n_sail = pos_sail.getLat()
-        let e_sail = pos_sail.getLon()
+        let n_sail = pos_sail.getN()
+        let e_sail = pos_sail.getE()
         let pos_pin = self.fleetMap["192.168.4.2:5000"]!.getPosition()
-        let n_pin = pos_pin.getLat()
-        let e_pin = pos_pin.getLon()
+        let n_pin = pos_pin.getN()
+        let e_pin = pos_pin.getE()
         return ((n_sail * e_pin) - (e_sail * n_pin)) / sqrt(pow(n_pin, 2) + pow(e_pin, 2))
     }
     
-    // Do any additional setup after loading the view, typically from a nib.
+    func gatherPositions(client: TCPClient, clientId: String) {
+        print("New connection from:\(client.address)[\(client.port)]")
+        while true {
+            //TODO: find the exact length to read
+            let d = client.read(71)
+            if let unwrapped = d {
+                if let string_msg = String(bytes: unwrapped, encoding: .utf8) {
+                    //print("     \(client.address)[\(client.port)]: \(string_msg)")
+                    do {
+                        let curpos = try Position(RTKLIBString: string_msg)
+                        self.fleetMap[clientId]!.setPosition(pos: curpos)
+                        let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
+                        //define the text shown in the table
+                        self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", dist_to_line) as String) as String + "m"
+                        //reload table data from main thread
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                    } catch PositionError.InvalidStringFormat {
+                        print("Invalid position string from RTKLIB")
+                    } catch {
+                        print("Unexpected error: \(error).")
+                    }
+                } else {
+                    print("Non-UTF-8 sequence from RTKLIB")
+                }
+            }
+        }
+        client.close()
+    }
+    
+    func runTCPServer() {
+        let server = TCPServer(address: "127.0.0.1", port: 8080)
+        switch server.listen() {
+        case .success:
+            while true {
+                if let client = server.accept() {
+                    //TODO: should probably use MAC address instead
+                    let clientId = client.address + ":" + String(client.port)
+                    self.fleetMap[clientId] = Sailboat()
+                    gatherPositions(client: client, clientId: clientId)
+                } else {
+                    print("TCP accept error")
+                }
+            }
+        case .failure(let error):
+            print(error)
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        for i in 0...1000 {
-            data.append("\(i)")
-        }
+        
+        //Set up the table's data source
         tableView.dataSource = self
+        
         //Initialize the timer to "full"
         seconds = timerLength
+        //Initialize the timer label
+        timerLabel.text = timeString(time: TimeInterval(seconds))
         
         //TODO: hard-coded pin and comm boat for testing
-        self.fleetMap["192.168.4.2:5000"] = Sailboat(id: "pin", pos: Position(GPST: 1.0, lat: 5.0, lon: 5.0, height: 0.0))
-        //init the timer label
-        timerLabel.text = timeString(time: TimeInterval(seconds))
+        self.fleetMap["192.168.4.1:5000"] = Sailboat(id: "comm", pos: Position(GPST: 1.0, n: 0.0, e: 0.0, u: 0.0))
+        self.fleetMap["192.168.4.2:5000"] = Sailboat(id: "pin", pos: Position(GPST: 1.0, n: 5.0, e: 5.0, u: 0.0))
         
         //Start the TCP server when the view loads on a separate high time precision thread
         DispatchQueue.global(qos: .userInteractive).async {
-            func echoService(client: TCPClient) {
-                let clientIdentifier = client.address + ":" + String(client.port)
-                print("New connection from:\(client.address)[\(client.port)]")
-                while true {
-                    //TODO: find the exact length to read
-                    let d = client.read(71)
-                    if let unwrapped = d {
-                        if let string_msg = String(bytes: unwrapped, encoding: .utf8) {
-                            print("     \(client.address)[\(client.port)]: \(string_msg)")
-                            do {
-                                let curpos = try Position(RTKLIBString: string_msg)
-                                self.fleetMap[clientIdentifier]!.setPosition(pos: curpos)
-                                print("DISTANCE TO LINE " + String(clientIdentifier) + ": " + String(self.calcDistanceToLine(sailboat: self.fleetMap[clientIdentifier]!)))
-                            } catch PositionError.InvalidStringFormat {
-                                print("Invalid position string from RTKLIB")
-                            } catch {
-                                print("Unexpected error: \(error).")
-                            }
-                        } else {
-                            print("Non-UTF-8 sequence from RTKLIB")
-                        }
-                    }
-                }
-                client.close()
-            }
-            
-            func testServer() {
-                let server = TCPServer(address: "127.0.0.1", port: 8080)
-                switch server.listen() {
-                case .success:
-                    while true {
-                        if let client = server.accept() {
-                            //TODO: should probably use MAC address instead
-                            let clientIdentifier = client.address + ":" + String(client.port)
-                            self.fleetMap[clientIdentifier] = Sailboat()
-                            echoService(client: client)
-                        } else {
-                            print("accept error")
-                        }
-                    }
-                case .failure(let error):
-                    print(error)
-                }
-            }
-            testServer()
+            self.runTCPServer()
         }
     }
 }
-
