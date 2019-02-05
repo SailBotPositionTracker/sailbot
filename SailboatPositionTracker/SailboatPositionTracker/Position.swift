@@ -8,6 +8,12 @@
 
 import Foundation
 
+extension String {
+    func removingWhitespaces() -> String {
+        return components(separatedBy: .whitespaces).joined()
+    }
+}
+
 enum PositionError: Error {
     case InvalidStringFormat
 }
@@ -16,30 +22,29 @@ class Position {
     var GPST: Double;
     var n: Double;
     var e: Double;
-    var u: Double;
     init() {
         GPST = 0
         n = 0
         e = 0
-        u = 0
     }
     init (GPST: Double, n: Double, e: Double, u: Double) {
         self.GPST = GPST
         self.n = n
         self.e = e
-        self.u = u
     }
     
     init (RTKLIBString: String) throws {
-        let cols = RTKLIBString.components(separatedBy: " ")
+        var input = RTKLIBString
+        input = input.removingWhitespaces()
+        print("INPUT PARSED:" + input)
+        let cols = RTKLIBString.components(separatedBy: ",")
         //check for standard RTKLIB format length
         if (cols.count != 15) {
             throw PositionError.InvalidStringFormat
         }
-        self.GPST = Double(cols[1])!
-        self.n = Double(cols[2])!
-        self.e = Double(cols[3])!
-        self.u = Double(cols[4])!
+        self.GPST = Double(cols[1].trimmingCharacters(in: .whitespaces))!
+        self.n = Double(cols[2].trimmingCharacters(in: .whitespaces))!
+        self.e = Double(cols[3].trimmingCharacters(in: .whitespaces))!
     }
     
     func getGPST() -> Double {
@@ -64,13 +69,5 @@ class Position {
     
     func setE(e: Double) {
         self.e = e
-    }
-    
-    func getU() -> Double {
-        return self.u
-    }
-    
-    func setU(u: Double) {
-        self.u = u
     }
 }

@@ -13,7 +13,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     @IBOutlet weak var tableView: UITableView!
     private var tableMap = [String: String]()
     
-    var timerLength: Int = 300
+    var timerLength: Int = 10
     var seconds: Int = 0
     var timer: Timer = Timer()
     var isTimerRunning: Bool = false
@@ -47,24 +47,29 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     @IBAction func resetButtonTapped(_ sender: UIButton) {
         timer.invalidate()
-        seconds = timerLength
-        isTimerRunning = false
-        timerLabel.text = timeString(time: TimeInterval(seconds))
+        resetTimer()
     }
     
     @objc func updateTimer() {
-        if seconds < 1 {
-            timer.invalidate()
-        } else {
-            seconds -= 1
-            timerLabel.text = timeString(time: TimeInterval(seconds))
-        }
+        seconds -= 1
+        timerLabel.text = timeString(seconds: seconds)
     }
     
-    func timeString(time:TimeInterval) -> String {
+    func resetTimer() {
+        seconds = timerLength
+        isTimerRunning = false
+        timerLabel.text = timeString(seconds: seconds)
+    }
+    
+    func timeString(seconds: Int) -> String {
+        let time = TimeInterval(abs(seconds))
         let min = Int(time) / 60 % 60
         let sec = Int(time) % 60
-        return String(format:"%01i:%02i", min, sec)
+        if (seconds < 1) {
+            return String(format:"+%01i:%02i", min, sec)
+        } else {
+            return String(format:"-%01i:%02i", min, sec)
+        }
     }
     
     func calcDistanceToLine(sailboat: Sailboat) -> Double {
@@ -96,34 +101,41 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     func gatherPositions(client: TCPClient, clientId: String) {
-        print("New connection from:\(client.address)[\(client.port)]")
+        print("New connection from: \(client.address)[\(client.port)]")
+        var str_buf = ""
         while true {
-            //TODO: find the exact length to read
-            let d = client.read(71)
+            let d = client.read(137)
+            //print("STRING BUFFER LENGTH: " + String(str_buf.count))
             if let unwrapped = d {
                 if let string_msg = String(bytes: unwrapped, encoding: .utf8) {
-                    //print("     \(client.address)[\(client.port)]: \(string_msg)")
-                    do {
-                        let curpos = try Position(RTKLIBString: string_msg)
-                        self.fleetMap[clientId]!.setPosition(pos: curpos)
-                        let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
-                        //define the text shown in the table
-                        self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", dist_to_line) as String) as String + "m"
-                        //reload table data from main thread
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
+                    //if a complete message has ended
+                    if (string_msg.contains("\n")) {
+                        str_buf += string_msg.components(separatedBy: "\n")[0]
+                        do {
+                            let curpos = try Position(RTKLIBString: str_buf)
+                            self.fleetMap[clientId]!.setPosition(pos: curpos)
+                            let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
+                            //define the text shown in the table
+                            self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", dist_to_line) as String) as String + "m"
+                            //reload table data from main thread
+                            DispatchQueue.main.async {
+                                self.tableView.reloadData()
+                            }
+                        } catch PositionError.InvalidStringFormat {
+                            print("Invalid position string from RTKLIB")
+                        } catch {
+                            print("Unexpected error: \(error).")
                         }
-                    } catch PositionError.InvalidStringFormat {
-                        print("Invalid position string from RTKLIB")
-                    } catch {
-                        print("Unexpected error: \(error).")
+                        //start the string buffer over again
+                        str_buf = string_msg.components(separatedBy: "\n")[1]
+                    } else {
+                        str_buf += string_msg
                     }
                 } else {
                     print("Non-UTF-8 sequence from RTKLIB")
                 }
             }
         }
-        client.close()
     }
     
     func runTCPServer() {
@@ -151,10 +163,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         //Set up the table's data source
         tableView.dataSource = self
         
-        //Initialize the timer to "full"
-        seconds = timerLength
-        //Initialize the timer label
-        timerLabel.text = timeString(time: TimeInterval(seconds))
+        resetTimer()
         
         //TODO: hard-coded pin and comm boat for testing
         self.fleetMap["192.168.4.1:5000"] = Sailboat(id: "comm", pos: Position(GPST: 1.0, n: 0.0, e: 0.0, u: 0.0))
