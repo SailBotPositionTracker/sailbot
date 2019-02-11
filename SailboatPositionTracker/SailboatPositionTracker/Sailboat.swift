@@ -9,15 +9,24 @@
 import Foundation
 
 class Sailboat {
-    var id: String;
-    var pos: Position;
+    enum raceStatus {
+        case notstarted
+        case started
+        case over
+        case cleared
+    }
+    var id: String
+    var pos: Position
+    var status: raceStatus
     init() {
         self.id = "NewSailboat"
         self.pos = Position()
+        self.status = raceStatus.notstarted
     }
     init(id: String, pos: Position) {
         self.id = id
         self.pos = pos
+        self.status = raceStatus.notstarted
     }
     
     func getId() -> String {
@@ -34,5 +43,13 @@ class Sailboat {
     
     func setPosition(pos: Position) {
         self.pos = pos
+    }
+    
+    func getStatus() -> raceStatus {
+        return self.status
+    }
+    
+    func setStatus(status: raceStatus) {
+        self.status = status
     }
 }

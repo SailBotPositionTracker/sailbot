@@ -22,6 +22,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     //map from TCP connection identifier to Sailboat object
     var fleetMap = [String: Sailboat]()
     
+    //boilerplate for sailboat table section
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -30,9 +31,21 @@ class ViewController: UIViewController, UITableViewDataSource {
         return data.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let data = Array(tableMap.values)
+        let data = Array(tableMap)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellReuseIdentifier")!
-        cell.textLabel?.text = data[indexPath.row]
+        cell.textLabel?.text = data[indexPath.row].value
+        
+        let status = fleetMap[data[indexPath.row].key]!.getStatus()
+        switch (status) {
+            case Sailboat.raceStatus.over:
+                cell.backgroundColor = UIColor.red
+            case Sailboat.raceStatus.notstarted:
+                cell.backgroundColor = UIColor.white
+            case Sailboat.raceStatus.started:
+                cell.backgroundColor = UIColor.green
+            case Sailboat.raceStatus.cleared:
+                cell.backgroundColor = UIColor.blue
+        }
         return cell
     }
     
@@ -51,6 +64,17 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     @objc func updateTimer() {
+        //store information about over the line boats at the start
+        if (seconds == 0) {
+            for (_, sailboat) in fleetMap {
+                //TODO: > 0 won't simply work for determining over the line
+                if (calcDistanceToLine(sailboat: sailboat) > 0) {
+                    sailboat.setStatus(status: Sailboat.raceStatus.over)
+                } else {
+                    sailboat.setStatus(status: Sailboat.raceStatus.started)
+                }
+            }
+        }
         seconds -= 1
         timerLabel.text = timeString(seconds: seconds)
     }
@@ -59,16 +83,21 @@ class ViewController: UIViewController, UITableViewDataSource {
         seconds = timerLength
         isTimerRunning = false
         timerLabel.text = timeString(seconds: seconds)
+        //reset race status from current race
+        for (_, sailboat) in fleetMap {
+            sailboat.setStatus(status: Sailboat.raceStatus.notstarted)
+        }
     }
     
     func timeString(seconds: Int) -> String {
         let time = TimeInterval(abs(seconds))
         let min = Int(time) / 60 % 60
         let sec = Int(time) % 60
+        let format_string = String(format:"%01i:%02i", min, sec)
         if (seconds < 1) {
-            return String(format:"+%01i:%02i", min, sec)
+            return "+" + format_string
         } else {
-            return String(format:"-%01i:%02i", min, sec)
+            return "-" + format_string
         }
     }
     
@@ -105,7 +134,6 @@ class ViewController: UIViewController, UITableViewDataSource {
         var str_buf = ""
         while true {
             let d = client.read(137)
-            //print("STRING BUFFER LENGTH: " + String(str_buf.count))
             if let unwrapped = d {
                 if let string_msg = String(bytes: unwrapped, encoding: .utf8) {
                     //if a complete message has ended
@@ -117,6 +145,14 @@ class ViewController: UIViewController, UITableViewDataSource {
                             let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
                             //define the text shown in the table
                             self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", dist_to_line) as String) as String + "m"
+                            //check if boat has cleared if the race has started
+                            //TODO: can't just use <=0 for line distance
+                            if (seconds <= 0) {
+                                if (self.fleetMap[clientId]!.getStatus() == Sailboat.raceStatus.over &&
+                                    dist_to_line <= 0) {
+                                    self.fleetMap[clientId]!.setStatus(status: Sailboat.raceStatus.cleared)
+                                }
+                            }
                             //reload table data from main thread
                             DispatchQueue.main.async {
                                 self.tableView.reloadData()
@@ -162,11 +198,9 @@ class ViewController: UIViewController, UITableViewDataSource {
         
         //Set up the table's data source
         tableView.dataSource = self
-        
         resetTimer()
         
-        //TODO: hard-coded pin and comm boat for testing
-        self.fleetMap["192.168.4.1:5000"] = Sailboat(id: "comm", pos: Position(GPST: 1.0, n: 0.0, e: 0.0, u: 0.0))
+        //TODO: hard-coded pin for testing
         self.fleetMap["192.168.4.2:5000"] = Sailboat(id: "pin", pos: Position(GPST: 1.0, n: 5.0, e: 5.0, u: 0.0))
         
         //Start the TCP server when the view loads on a separate high time precision thread
