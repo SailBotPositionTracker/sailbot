@@ -144,51 +144,43 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     func gatherPositions(client: TCPClient, clientId: String) {
-        var str_buf = ""
+        var str_buf: [Byte] = []
         while true {
             //read one byte at a time
             let d = client.read(1)
-            if let unwrapped = d {
-                print(unwrapped)
-                if let string_msg = String(bytes: unwrapped, encoding: .utf8) {
-                    //if a complete message has ended
-                    if (string_msg.contains("\n")) {
-                        let parts = string_msg.components(separatedBy: "\n")
-                        str_buf += parts[0]
-                        do {
-                            //generate a Position from this RTKLIB string
-                            let curpos = try Position(RTKLIBString: str_buf)
-                            //set the Position of the corresponding Sailboat
-                            self.fleetMap[clientId]!.setPosition(pos: curpos)
-                            let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
-                            print("DIST TO LINE: " + String(dist_to_line))
-                            //define the text shown in the table
-                            let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
-                            self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", corrected_dist_to_line) as String) as String + "m"
-                            //if the race has started
-                            if (seconds <= 0) {
-                                //if a boat that was over has cleared, set its status to indicate this
-                                if (self.fleetMap[clientId]!.getStatus() == Sailboat.raceStatus.over &&
-                                    !overLine(distance: dist_to_line)) {
-                                    self.fleetMap[clientId]!.setStatus(status: Sailboat.raceStatus.cleared)
-                                }
+            //if not a newline
+            if (d != [10]) {
+                str_buf += d!
+            } else {
+                //if a complete message has ended
+                if let string_msg = String(bytes: str_buf, encoding: .utf8) {
+                    do {
+                        //generate a Position from this RTKLIB string
+                        let curpos = try Position(RTKLIBString: string_msg)
+                        //set the Position of the corresponding Sailboat
+                        self.fleetMap[clientId]!.setPosition(pos: curpos)
+                        let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
+                        //define the text shown in the table
+                        let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
+                        self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", corrected_dist_to_line) as String) as String + "m"
+                        //if the race has started
+                        if (seconds <= 0) {
+                            //if a boat that was over has cleared, set its status to indicate this
+                            if (self.fleetMap[clientId]!.getStatus() == Sailboat.raceStatus.over &&
+                                !overLine(distance: dist_to_line)) {
+                                self.fleetMap[clientId]!.setStatus(status: Sailboat.raceStatus.cleared)
                             }
-                            //reload table data from main thread
-                            DispatchQueue.main.async {
-                                self.tableView.reloadData()
-                            }
-                        } catch PositionError.InvalidStringFormat {
-                            print("Invalid position string from RTKLIB")
-                        } catch {
-                            print("Unexpected error: \(error).")
                         }
-                        //start the string buffer over again
-                        str_buf = parts[1]
-                    } else {
-                        str_buf += string_msg
+                        //reload table data from main thread
+                        DispatchQueue.main.async {
+                            self.tableView.reloadData()
+                        }
+                    } catch PositionError.InvalidStringFormat {
+                        print("Invalid position string from RTKLIB")
+                    } catch {
+                        print("Unexpected error: \(error).")
                     }
-                } else {
-                    print("Non-UTF-8 sequence from RTKLIB")
+                    str_buf = []
                 }
             }
         }
