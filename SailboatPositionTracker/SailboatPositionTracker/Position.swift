@@ -36,7 +36,7 @@ class Position {
     init (RTKLIBString: String) throws {
         var input = RTKLIBString
         input = input.removingWhitespaces()
-        print("INPUT PARSED:" + input)
+        //print("INPUT PARSED:" + input)
         let cols = RTKLIBString.components(separatedBy: ",")
         //check for standard RTKLIB format length
         if (cols.count != 15) {

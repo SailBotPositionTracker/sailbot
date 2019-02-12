@@ -19,6 +19,9 @@ class ViewController: UIViewController, UITableViewDataSource {
     var isTimerRunning: Bool = false
     @IBOutlet weak var timerLabel: UILabel!
     
+    //true: + distance is over the line, false: - distance is over the line
+    var overLineDirection = true
+    
     //map from TCP connection identifier to Sailboat object
     var fleetMap = [String: Sailboat]()
     
@@ -36,6 +39,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         cell.textLabel?.text = data[indexPath.row].value
         
         let status = fleetMap[data[indexPath.row].key]!.getStatus()
+        //define the table row color for each possible race status
         switch (status) {
             case Sailboat.raceStatus.over:
                 cell.backgroundColor = UIColor.red
@@ -47,6 +51,15 @@ class ViewController: UIViewController, UITableViewDataSource {
                 cell.backgroundColor = UIColor.blue
         }
         return cell
+    }
+    
+    
+    @IBAction func swapLineButtonTapped(_ sender: UIButton) {
+        //only allow line side swaps before the start of the race
+        //TODO: could interfere with I flag
+        if (seconds > 0) {
+            overLineDirection = !overLineDirection
+        }
     }
     
     @IBAction func startButtonTapped(_ sender: UIButton) {
@@ -64,16 +77,16 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     @objc func updateTimer() {
-        //store information about over the line boats at the start
-        if (seconds == 0) {
+        //store information about over the line boats at the moment of the start
+        if (seconds == 1) {
             for (_, sailboat) in fleetMap {
-                //TODO: > 0 won't simply work for determining over the line
-                if (calcDistanceToLine(sailboat: sailboat) > 0) {
+                if (overLine(distance: calcDistanceToLine(sailboat: sailboat))) {
                     sailboat.setStatus(status: Sailboat.raceStatus.over)
                 } else {
                     sailboat.setStatus(status: Sailboat.raceStatus.started)
                 }
             }
+            self.tableView.reloadData()
         }
         seconds -= 1
         timerLabel.text = timeString(seconds: seconds)
@@ -94,15 +107,16 @@ class ViewController: UIViewController, UITableViewDataSource {
         let min = Int(time) / 60 % 60
         let sec = Int(time) % 60
         let format_string = String(format:"%01i:%02i", min, sec)
-        if (seconds < 1) {
-            return "+" + format_string
-        } else {
-            return "-" + format_string
-        }
+        return ((seconds < 1) ? "+" : "-") + format_string
+    }
+    
+    func overLine(distance: Double) -> Bool {
+        return (overLineDirection && distance > 0) || (!overLineDirection && distance < 0)
     }
     
     func calcDistanceToLine(sailboat: Sailboat) -> Double {
         //TODO: reference the boat and pin trackers in a more scalable and concrete way
+        
         //using positions of both pin and committee boat
         /*
         let pos_sail = sailboat.getPosition()
@@ -130,26 +144,32 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     func gatherPositions(client: TCPClient, clientId: String) {
-        print("New connection from: \(client.address)[\(client.port)]")
         var str_buf = ""
         while true {
-            let d = client.read(137)
+            //read one byte at a time
+            let d = client.read(1)
             if let unwrapped = d {
+                print(unwrapped)
                 if let string_msg = String(bytes: unwrapped, encoding: .utf8) {
                     //if a complete message has ended
                     if (string_msg.contains("\n")) {
-                        str_buf += string_msg.components(separatedBy: "\n")[0]
+                        let parts = string_msg.components(separatedBy: "\n")
+                        str_buf += parts[0]
                         do {
+                            //generate a Position from this RTKLIB string
                             let curpos = try Position(RTKLIBString: str_buf)
+                            //set the Position of the corresponding Sailboat
                             self.fleetMap[clientId]!.setPosition(pos: curpos)
                             let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
+                            print("DIST TO LINE: " + String(dist_to_line))
                             //define the text shown in the table
-                            self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", dist_to_line) as String) as String + "m"
-                            //check if boat has cleared if the race has started
-                            //TODO: can't just use <=0 for line distance
+                            let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
+                            self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", corrected_dist_to_line) as String) as String + "m"
+                            //if the race has started
                             if (seconds <= 0) {
+                                //if a boat that was over has cleared, set its status to indicate this
                                 if (self.fleetMap[clientId]!.getStatus() == Sailboat.raceStatus.over &&
-                                    dist_to_line <= 0) {
+                                    !overLine(distance: dist_to_line)) {
                                     self.fleetMap[clientId]!.setStatus(status: Sailboat.raceStatus.cleared)
                                 }
                             }
@@ -163,7 +183,7 @@ class ViewController: UIViewController, UITableViewDataSource {
                             print("Unexpected error: \(error).")
                         }
                         //start the string buffer over again
-                        str_buf = string_msg.components(separatedBy: "\n")[1]
+                        str_buf = parts[1]
                     } else {
                         str_buf += string_msg
                     }
@@ -179,13 +199,18 @@ class ViewController: UIViewController, UITableViewDataSource {
         switch server.listen() {
         case .success:
             while true {
-                if let client = server.accept() {
-                    //TODO: should probably use MAC address instead
-                    let clientId = client.address + ":" + String(client.port)
-                    self.fleetMap[clientId] = Sailboat()
-                    gatherPositions(client: client, clientId: clientId)
-                } else {
-                    print("TCP accept error")
+                //if a race has started, don't allow a new connection
+                if (seconds > 0) {
+                    //if a new RTKLIB connection is initiated
+                    if let client = server.accept() {
+                        //TODO: should probably use MAC address instead
+                        let clientId = client.address + ":" + String(client.port)
+                        self.fleetMap[clientId] = Sailboat()
+                        //monitor this connection
+                        gatherPositions(client: client, clientId: clientId)
+                    } else {
+                        print("TCP accept error")
+                    }
                 }
             }
         case .failure(let error):
@@ -195,14 +220,11 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         //Set up the table's data source
         tableView.dataSource = self
         resetTimer()
-        
         //TODO: hard-coded pin for testing
         self.fleetMap["192.168.4.2:5000"] = Sailboat(id: "pin", pos: Position(GPST: 1.0, n: 5.0, e: 5.0, u: 0.0))
-        
         //Start the TCP server when the view loads on a separate high time precision thread
         DispatchQueue.global(qos: .userInteractive).async {
             self.runTCPServer()
