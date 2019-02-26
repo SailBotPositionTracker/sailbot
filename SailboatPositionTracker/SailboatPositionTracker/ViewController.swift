@@ -13,7 +13,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     @IBOutlet weak var tableView: UITableView!
     private var tableMap = [String: String]()
     
-    var timerLength: Int = 10
+    var timerLength: Int = 3
     var seconds: Int = 0
     var timer: Timer = Timer()
     var isTimerRunning: Bool = false
@@ -59,6 +59,14 @@ class ViewController: UIViewController, UITableViewDataSource {
         //TODO: could interfere with I flag
         if (seconds > 0) {
             overLineDirection = !overLineDirection
+            for (clientId, sailboat) in fleetMap {
+                if (sailboat.getId() != "pin") {
+                    let dist_to_line = self.calcDistanceToLine(sailboat: sailboat)
+                    let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
+                    self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", corrected_dist_to_line) as String) as String + "m"
+                }
+            }
+            self.tableView.reloadData()
         }
     }
     
@@ -100,6 +108,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         for (_, sailboat) in fleetMap {
             sailboat.setStatus(status: Sailboat.raceStatus.notstarted)
         }
+        self.tableView.reloadData()
     }
     
     func timeString(seconds: Int) -> String {
