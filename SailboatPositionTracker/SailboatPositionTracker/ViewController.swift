@@ -143,65 +143,46 @@ class ViewController: UIViewController, UITableViewDataSource {
         return ((n_sail * e_pin) - (e_sail * n_pin)) / sqrt(pow(n_pin, 2) + pow(e_pin, 2))
     }
     
-    func gatherPositions(client: TCPClient, clientId: String) {
-        var str_buf: [Byte] = []
-        while true {
-            //read one byte at a time
-            let d = client.read(1)
-            //if not a newline
-            if (d != [10]) {
-                str_buf += d!
-            } else {
-                //if a complete message has ended
-                if let string_msg = String(bytes: str_buf, encoding: .utf8) {
-                    do {
-                        //generate a Position from this RTKLIB string
-                        let curpos = try Position(RTKLIBString: string_msg)
-                        //set the Position of the corresponding Sailboat
-                        self.fleetMap[clientId]!.setPosition(pos: curpos)
-                        let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
-                        //define the text shown in the table
-                        let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
-                        self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", corrected_dist_to_line) as String) as String + "m"
-                        //if the race has started
-                        if (seconds <= 0) {
-                            //if a boat that was over has cleared, set its status to indicate this
-                            if (self.fleetMap[clientId]!.getStatus() == Sailboat.raceStatus.over &&
-                                !overLine(distance: dist_to_line)) {
-                                self.fleetMap[clientId]!.setStatus(status: Sailboat.raceStatus.cleared)
-                            }
-                        }
-                        //reload table data from main thread
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                        }
-                    } catch PositionError.InvalidStringFormat {
-                        print("Invalid position string from RTKLIB")
-                    } catch {
-                        print("Unexpected error: \(error).")
-                    }
-                    str_buf = []
-                }
-            }
-        }
-    }
-    
-    func runTCPServer() {
-        let server = TCPServer(address: "127.0.0.1", port: 8080)
-        switch server.listen() {
+    func runTCPClient() {
+        //TODO this should be 192.168.4.1:9000 for real testing
+        let client = TCPClient(address: "127.0.0.1", port: 5002)
+        switch client.connect(timeout: 1) {
         case .success:
             while true {
-                //if a race has started, don't allow a new connection
-                if (seconds > 0) {
-                    //if a new RTKLIB connection is initiated
-                    if let client = server.accept() {
-                        //TODO: should probably use MAC address instead
-                        let clientId = client.address + ":" + String(client.port)
-                        self.fleetMap[clientId] = Sailboat()
-                        //monitor this connection
-                        gatherPositions(client: client, clientId: clientId)
-                    } else {
-                        print("TCP accept error")
+                //TODO find final message length
+                let d = client.read(52)
+                if (d != nil) {
+                    if let string_msg = String(bytes: d!, encoding: .utf8) {
+                        do {
+                            let clientId = String(string_msg.prefix(5))
+                            if (self.fleetMap[clientId] == nil) {
+                                self.fleetMap[clientId] = Sailboat()
+                            }
+                            //generate a Position from this RTKLIB string
+                            let curpos = try Position(RTKLIBString: string_msg)
+                            //set the Position of the corresponding Sailboat
+                            self.fleetMap[clientId]!.setPosition(pos: curpos)
+                            let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
+                            //define the text shown in the table
+                            let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
+                            self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", corrected_dist_to_line) as String) as String + "m"
+                            //if the race has started
+                            if (seconds <= 0) {
+                                //if a boat that was over has cleared, set its status to indicate this
+                                if (self.fleetMap[clientId]!.getStatus() == Sailboat.raceStatus.over &&
+                                    !overLine(distance: dist_to_line)) {
+                                    self.fleetMap[clientId]!.setStatus(status: Sailboat.raceStatus.cleared)
+                                }
+                            }
+                            //reload table data from main thread
+                            DispatchQueue.main.async {
+                                self.tableView.reloadData()
+                            }
+                        } catch PositionError.InvalidStringFormat {
+                            print("Invalid position string from RTKLIB")
+                        } catch {
+                            print("Unexpected error: \(error).")
+                        }
                     }
                 }
             }
@@ -219,7 +200,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         self.fleetMap["192.168.4.2:5000"] = Sailboat(id: "pin", pos: Position(GPST: 1.0, n: 5.0, e: 5.0, u: 0.0))
         //Start the TCP server when the view loads on a separate high time precision thread
         DispatchQueue.global(qos: .userInteractive).async {
-            self.runTCPServer()
+            self.runTCPClient()
         }
     }
 }

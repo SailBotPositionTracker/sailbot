@@ -34,17 +34,16 @@ class Position {
     }
     
     init (RTKLIBString: String) throws {
-        var input = RTKLIBString
-        input = input.removingWhitespaces()
-        //print("INPUT PARSED:" + input)
+        //T1234,0001,000001.000,000000001.0000,000000002.0000
         let cols = RTKLIBString.components(separatedBy: ",")
         //check for standard RTKLIB format length
-        if (cols.count != 15) {
+        if (cols.count != 5) {
             throw PositionError.InvalidStringFormat
         }
-        self.GPST = Double(cols[1].trimmingCharacters(in: .whitespaces))!
-        self.n = Double(cols[2].trimmingCharacters(in: .whitespaces))!
-        self.e = Double(cols[3].trimmingCharacters(in: .whitespaces))!
+        //TODO: refine how we deal with GPST times
+        self.GPST = 7 * Double(cols[1])! + Double(cols[2])!
+        self.n = Double(cols[3])!
+        self.e = Double(cols[4])!
     }
     
     func getGPST() -> Double {
