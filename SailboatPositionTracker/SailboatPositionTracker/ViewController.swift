@@ -149,8 +149,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         switch client.connect(timeout: 1) {
         case .success:
             while true {
-                //TODO find final message length
-                let d = client.read(52)
+                let d = client.read(53)
                 if (d != nil) {
                     if let string_msg = String(bytes: d!, encoding: .utf8) {
                         do {
