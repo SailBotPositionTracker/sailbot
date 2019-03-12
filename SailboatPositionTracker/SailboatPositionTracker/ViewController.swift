@@ -154,11 +154,11 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     func runTCPClient() {
         //TODO this should be 192.168.4.1:9000 for real testing
-        let client = TCPClient(address: "127.0.0.1", port: 5002)
+        let client = TCPClient(address: "192.168.4.1", port: 9000)
         switch client.connect(timeout: 1) {
         case .success:
             while true {
-                let d = client.read(53)
+                let d = client.read(54)
                 if (d != nil) {
                     if let string_msg = String(bytes: d!, encoding: .utf8) {
                         do {
