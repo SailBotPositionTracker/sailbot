@@ -53,6 +53,25 @@ class ViewController: UIViewController, UITableViewDataSource {
         return cell
     }
     
+    @IBOutlet var ubeView: UIView!
+    @IBOutlet var leadingC: NSLayoutConstraint!
+    @IBOutlet var trailingC: NSLayoutConstraint!
+    var settingsMenuIsVisible = false
+    
+    @IBAction func hamburgerBtnTapped(_ sender: Any) {
+        if !settingsMenuIsVisible {
+            leadingC.constant = 150
+            trailingC.constant = -150
+        } else {
+            leadingC.constant = 0
+            trailingC.constant = 0
+        }
+        settingsMenuIsVisible = !settingsMenuIsVisible
+        
+        UIView.animate(withDuration: 0.2, delay: 0.0, options: .curveEaseIn, animations: {
+            self.view.layoutIfNeeded()
+        })
+    }
     
     @IBAction func swapLineButtonTapped(_ sender: UIButton) {
         //only allow line side swaps before the start of the race
