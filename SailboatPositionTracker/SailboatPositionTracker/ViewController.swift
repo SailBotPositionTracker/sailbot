@@ -26,8 +26,36 @@ class ViewController: UIViewController, UITableViewDataSource {
     var fleetMap = [String: Sailboat]()
     
     //boilerplate for sailboat table section
+    private func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        
+        let view = UIView()
+        let label = UILabel()
+        
+        switch section {
+        case 0:
+            label.text="Date"
+        case 1:
+            label.text="Name"
+        case 2:
+            label.text="Amount"
+        default:
+            print()
+        }
+        
+        view.addSubview(label)
+        
+        return view
+    }
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
+    }
+    //delete an element from the table
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let tableIndex = Array(tableMap.keys)[indexPath.row]
+            tableMap.removeValue(forKey: tableIndex)
+            tableView.deleteRows(at: [indexPath], with: .fade)
+        }
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         let data = Array(tableMap.values)
@@ -173,7 +201,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     func runTCPClient() {
         //TODO this should be 192.168.4.1:9000 for real testing
-        let client = TCPClient(address: "192.168.4.1", port: 9000)
+        let client = TCPClient(address: "127.0.0.1", port: 9001)
         switch client.connect(timeout: 1) {
         case .success:
             while true {
