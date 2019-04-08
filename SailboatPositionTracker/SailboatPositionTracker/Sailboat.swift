@@ -23,6 +23,11 @@ class Sailboat {
         self.pos = Position()
         self.status = raceStatus.notstarted
     }
+    init(id: String) {
+        self.id = id
+        self.pos = Position()
+        self.status = raceStatus.notstarted
+    }
     init(id: String, pos: Position) {
         self.id = id
         self.pos = pos
