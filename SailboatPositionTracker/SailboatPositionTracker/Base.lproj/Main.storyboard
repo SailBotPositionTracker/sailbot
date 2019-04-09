@@ -21,7 +21,20 @@
                             <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="T5f-II-ZbF" userLabel="Settings Side View">
                                 <rect key="frame" x="0.0" y="70" width="768" height="904"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="IzA-Vc-ZGN" userLabel="Add/Change Pin">
+                                        <rect key="frame" x="35" y="38" width="177" height="42"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="25"/>
+                                        <state key="normal" title="Add/Change Pin">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="addPinButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="2Hk-sG-DNs"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" red="1" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ZIG-sg-TMU" userLabel="Content View">
                                 <rect key="frame" x="0.0" y="70" width="768" height="904"/>
@@ -30,7 +43,9 @@
                                         <rect key="frame" x="558" y="17" width="143" height="42"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Swap Line"/>
+                                        <state key="normal" title="Swap Line">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
                                         <connections>
                                             <action selector="swapLineButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="SGD-m9-BRL"/>
                                         </connections>
@@ -39,7 +54,9 @@
                                         <rect key="frame" x="68" y="53" width="149" height="42"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Reset"/>
+                                        <state key="normal" title="Reset">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
                                         <connections>
                                             <action selector="resetButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="XnZ-tz-Qly"/>
                                         </connections>
@@ -48,7 +65,9 @@
                                         <rect key="frame" x="68" y="17" width="149" height="42"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Start/Stop"/>
+                                        <state key="normal" title="Start/Stop">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
                                         <connections>
                                             <action selector="startButtonTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="Tjl-6Q-pZ8"/>
                                         </connections>
@@ -79,13 +98,15 @@
                                         <rect key="frame" x="558" y="53" width="143" height="42"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" type="system" pointSize="25"/>
-                                        <state key="normal" title="Add Boat"/>
+                                        <state key="normal" title="Add Boat">
+                                            <color key="titleColor" cocoaTouchSystemColor="darkTextColor"/>
+                                        </state>
                                         <connections>
                                             <action selector="addBoatTapped:" destination="BYZ-38-t0r" eventType="touchUpInside" id="wYF-Fx-7g9"/>
                                         </connections>
                                     </button>
                                 </subviews>
-                                <color key="backgroundColor" red="0.24313725490196078" green="0.55686274509803924" blue="0.87058823529411766" alpha="0.26000000000000001" colorSpace="calibratedRGB"/>
+                                <color key="backgroundColor" red="0.24313725489999999" green="0.5568627451" blue="0.87058823529999996" alpha="1" colorSpace="calibratedRGB"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

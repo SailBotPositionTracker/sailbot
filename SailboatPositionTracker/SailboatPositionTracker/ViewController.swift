@@ -89,8 +89,8 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     @IBAction func hamburgerBtnTapped(_ sender: Any) {
         if !settingsMenuIsVisible {
-            leadingC.constant = 150
-            trailingC.constant = -150
+            leadingC.constant = 300
+            trailingC.constant = -300
         } else {
             leadingC.constant = 0
             trailingC.constant = 0
@@ -102,6 +102,32 @@ class ViewController: UIViewController, UITableViewDataSource {
         })
     }
     
+    @IBAction func addPinButtonTapped(_ sender: UIButton) {
+        let alert = UIAlertController(title: "Add/Change Pin",
+                                      message: "Enter the new pin's tracker ID.",
+                                      preferredStyle: UIAlertController.Style.alert)
+        let ok = UIAlertAction(title: "OK",
+                               style: UIAlertAction.Style.default) { (action: UIAlertAction) in
+                                let clientId = alert.textFields![0].text
+                                if (clientId != "") {
+                                    self.removePin()
+                                    self.fleetMap[clientId!] = Sailboat(id: "PIN")
+                                    //TODO: show pin in table only for testing
+                                    self.tableMap[clientId!] = self.pinTableText(clientId: clientId!)
+                                    DispatchQueue.main.async {
+                                        self.tableView.reloadData()
+                                    }
+                                }
+        }
+        let cancel = UIAlertAction(title: "Cancel",
+                                   style: UIAlertAction.Style.cancel,
+                                   handler: nil)
+        alert.addTextField { (textField: UITextField) in textField.placeholder = "Tracker ID" }
+        alert.addAction(ok)
+        alert.addAction(cancel)
+        self.present(alert, animated: true, completion: nil)
+    }
+    
     @IBAction func swapLineButtonTapped(_ sender: UIButton) {
         //only allow line side swaps before the start of the race
         //TODO: could interfere with I flag
@@ -111,7 +137,7 @@ class ViewController: UIViewController, UITableViewDataSource {
                 if (sailboat.getId() != "PIN") {
                     let dist_to_line = self.calcDistanceToLine(sailboat: sailboat)
                     let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
-                    self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", corrected_dist_to_line) as String) as String + "m"
+                    self.tableMap[clientId] = self.sailboatTableText(clientId: clientId, dist: corrected_dist_to_line)
                 }
             }
             self.tableView.reloadData()
@@ -128,27 +154,14 @@ class ViewController: UIViewController, UITableViewDataSource {
                                     let sailNumberField = alert.textFields![1]
                                     let fleetField = alert.textFields![2]
                                     let clientId = trackerField.text
-                                    if (clientId != "") && (sailNumberField.text != "") {
-                                        if (sailNumberField.text == "PIN") {
-                                            self.removePin()
-                                            self.fleetMap[clientId!] = Sailboat(id: sailNumberField.text!)
-                                            //TODO: show pin in table only for testing
-                                            self.tableMap[clientId!] = "PIN (" + clientId! + "): [E: " + (NSString(format: "%.2f", self.fleetMap[clientId!]!.getPosition().getE()) as String) as String + ", N: " + (NSString(format: "%.2f", self.fleetMap[clientId!]!.getPosition().getN()) as String) as String + "] m"
-                                            print("pin added to table")
-                                            DispatchQueue.main.async {
-                                                self.tableView.reloadData()
-                                            }
-                                        }
-                                        if (fleetField.text != "") {
-                                            //don't allow pin to be reassigned by ID
-                                            if (self.getPinID() != clientId!) {
-                                                self.fleetMap[clientId!] = Sailboat(id: sailNumberField.text!, fleet: fleetField.text!)
-                                                self.tableMap[clientId!] = String(clientId!)
-                                                //reload table data from main thread
-                                                DispatchQueue.main.async {
-                                                    self.tableView.reloadData()
-                                                }
-                                            }
+                                    //don't allow pin to be reassigned by tracker ID
+                                    //don't allow pin to be reassigned by sailNumber
+                                    if (clientId != "") && (sailNumberField.text != "") && (sailNumberField.text != "PIN") && (fleetField.text != "") && (self.getPinID() != clientId!) {
+                                        self.fleetMap[clientId!] = Sailboat(id: sailNumberField.text!, fleet: fleetField.text!)
+                                        self.tableMap[clientId!] = String(clientId!)
+                                        //reload table data from main thread
+                                        DispatchQueue.main.async {
+                                            self.tableView.reloadData()
                                         }
                                     }
         }
@@ -242,6 +255,14 @@ class ViewController: UIViewController, UITableViewDataSource {
         }
     }
     
+    func pinTableText(clientId: String) -> String {
+        return "PIN (" + clientId + "): [E: " + (NSString(format: "%.2f", self.fleetMap[clientId]!.getPosition().getE()) as String) as String + ", N: " + (NSString(format: "%.2f", self.fleetMap[clientId]!.getPosition().getN()) as String) as String + "] m"
+    }
+    
+    func sailboatTableText(clientId: String, dist: Double) -> String {
+        return String(clientId) + ": " + (NSString(format: "%.2f", dist) as String) as String + "m"
+    }
+    
     func calcDistanceToLine(sailboat: Sailboat) -> Double {
         //TODO: reference the boat and pin trackers in a more scalable and concrete way
         
@@ -290,12 +311,12 @@ class ViewController: UIViewController, UITableViewDataSource {
                                 self.fleetMap[clientId]!.setPosition(pos: curpos)
                                 //if we're getting data for the pin
                                 if (self.fleetMap[clientId]!.getId() == "PIN") {
-                                    self.tableMap[clientId] = "PIN (" + clientId + "): [E: " + (NSString(format: "%.2f", self.fleetMap[clientId]!.getPosition().getE()) as String) as String + ", N: " + (NSString(format: "%.2f", self.fleetMap[clientId]!.getPosition().getN()) as String) as String + "] m"
+                                    self.tableMap[clientId] = pinTableText(clientId: clientId)
                                 } else { //if we're getting data for a boat
                                     let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
                                     //define the text shown in the table
                                     let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
-                                    self.tableMap[clientId] = String(clientId) + ": " + (NSString(format: "%.2f", corrected_dist_to_line) as String) as String + "m"
+                                    self.tableMap[clientId] = sailboatTableText(clientId: clientId, dist: corrected_dist_to_line)
                                     //if the race has started
                                     if (seconds <= 0) {
                                         //if a boat that was over has cleared, set its status to indicate this
@@ -332,7 +353,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         //TODO: hard-coded pin for testing
         self.fleetMap["DEFAULT_PIN"] = Sailboat(id: "PIN", pos: Position(GPST: 1.0, n: 5.0, e: 5.0))
         //TODO: show pins for now for testing
-        self.tableMap["DEFAULT_PIN"] = "DEFAULT PIN: [E: " + (NSString(format: "%.2f", self.fleetMap["DEFAULT_PIN"]!.getPosition().getE()) as String) as String + ", N: " + (NSString(format: "%.2f", self.fleetMap["DEFAULT_PIN"]!.getPosition().getN()) as String) as String + "] m"
+        self.tableMap["DEFAULT_PIN"] = pinTableText(clientId: "DEFAULT_PIN")
         
         //Start the TCP server when the view loads on a separate high time precision thread
         DispatchQueue.global(qos: .userInteractive).async {
