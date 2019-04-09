@@ -136,7 +136,8 @@ class ViewController: UIViewController, UITableViewDataSource {
             for (clientId, sailboat) in fleetMap {
                 if (sailboat.getId() != "PIN") {
                     let dist_to_line = self.calcDistanceToLine(sailboat: sailboat)
-                    let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
+                    let corrected_dist_to_line = self.calcCorrectedDist(dist: dist_to_line)
+                    print(corrected_dist_to_line)
                     self.tableMap[clientId] = self.sailboatTableText(clientId: clientId, dist: corrected_dist_to_line)
                 }
             }
@@ -283,13 +284,21 @@ class ViewController: UIViewController, UITableViewDataSource {
         */
         
         //if relative to the committee boat (assuming base tracker is at (0, 0) at line boat end)
-        let pos_sail = sailboat.getPosition()
-        let n_sail = pos_sail.getN()
-        let e_sail = pos_sail.getE()
         let pos_pin = getPin()!.getPosition()
         let n_pin = pos_pin.getN()
         let e_pin = pos_pin.getE()
+        //if pin has just been initialized
+        if (n_pin == 0) && (e_pin == 0) {
+            return 0
+        }
+        let pos_sail = sailboat.getPosition()
+        let n_sail = pos_sail.getN()
+        let e_sail = pos_sail.getE()
         return ((n_sail * e_pin) - (e_sail * n_pin)) / sqrt(pow(n_pin, 2) + pow(e_pin, 2))
+    }
+    
+    func calcCorrectedDist(dist: Double) -> Double {
+        return (dist == 0) ? 0 : ((overLineDirection) ? dist : -dist)
     }
     
     func runTCPClient() {
@@ -315,7 +324,7 @@ class ViewController: UIViewController, UITableViewDataSource {
                                 } else { //if we're getting data for a boat
                                     let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
                                     //define the text shown in the table
-                                    let corrected_dist_to_line = (overLineDirection) ? dist_to_line : -dist_to_line
+                                    let corrected_dist_to_line = calcCorrectedDist(dist: dist_to_line)
                                     self.tableMap[clientId] = sailboatTableText(clientId: clientId, dist: corrected_dist_to_line)
                                     //if the race has started
                                     if (seconds <= 0) {
