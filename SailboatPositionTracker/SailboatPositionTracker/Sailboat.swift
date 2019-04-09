@@ -16,22 +16,14 @@ class Sailboat {
         case cleared
     }
     var id: String
+    var fleet: String
     var pos: Position
     var status: raceStatus
-    init() {
-        self.id = "NewSailboat"
-        self.pos = Position()
-        self.status = raceStatus.notstarted
-    }
-    init(id: String) {
+    init(id: String = "NewSailboat", fleet: String = "", pos: Position = Position(), status: raceStatus = raceStatus.notstarted) {
         self.id = id
-        self.pos = Position()
-        self.status = raceStatus.notstarted
-    }
-    init(id: String, pos: Position) {
-        self.id = id
+        self.fleet = fleet
         self.pos = pos
-        self.status = raceStatus.notstarted
+        self.status = status
     }
     
     func getId() -> String {
@@ -40,6 +32,14 @@ class Sailboat {
     
     func setId(id: String) {
         self.id = id
+    }
+    
+    func getFleet() -> String {
+        return self.fleet
+    }
+    
+    func setFleet(fleet: String) {
+        self.fleet = fleet
     }
     
     func getPosition() -> Position {

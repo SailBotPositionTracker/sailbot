@@ -22,12 +22,7 @@ class Position {
     var GPST: Double;
     var n: Double;
     var e: Double;
-    init() {
-        GPST = 0
-        n = 0
-        e = 0
-    }
-    init (GPST: Double, n: Double, e: Double, u: Double) {
+    init (GPST: Double = 0, n: Double = 0, e: Double = 0) {
         self.GPST = GPST
         self.n = n
         self.e = e
