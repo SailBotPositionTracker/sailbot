@@ -226,11 +226,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         let format_string = String(format:"%01i:%02i", min, sec)
         return ((seconds < 1) ? "+" : "-") + format_string
     }
-    /*
-    func overLine(distance: Double) -> Bool {
-        return (overLineDirection && distance > 0) || (!overLineDirection && distance < 0)
-    }
-    */
+
     func getPinID() -> String? {
         for tracker_id in fleetMap.keys {
             if fleetMap[tracker_id]!.id == "PIN" {
@@ -300,7 +296,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     func runTCPClient() {
         //TODO this should be 192.168.4.1:9000 for real testing
-        let client = TCPClient(address: "127.0.0.1", port: 9001)
+        let client = TCPClient(address: "192.168.4.1", port: 9000)
         switch client.connect(timeout: 1) {
         case .success:
             while true {
@@ -355,7 +351,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         resetTimer()
         
         //define the default pin
-        self.fleetMap["Default"] = Sailboat(id: "PIN", pos: Position(n: 1.0, e: 1.0))
+        self.fleetMap["Default"] = Sailboat(id: "PIN")
         pinTableText(clientId: "Default")
         
         //Start the TCP server when the view loads on a separate high time precision thread
