@@ -137,8 +137,7 @@ class ViewController: UIViewController, UITableViewDataSource {
             for (clientId, sailboat) in fleetMap {
                 if (sailboat.getId() != "PIN") {
                     let dist_to_line = self.calcDistanceToLine(sailboat: sailboat)
-                    let corrected_dist_to_line = self.calcCorrectedDist(dist: dist_to_line)
-                    self.tableMap[clientId] = self.sailboatTableText(clientId: clientId, dist: corrected_dist_to_line)
+                    self.tableMap[clientId] = self.sailboatTableText(clientId: clientId, dist: dist_to_line)
                 }
             }
             self.tableView.reloadData()
@@ -197,7 +196,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         //store information about over the line boats at the moment of the start
         if (seconds == 1) {
             for (_, sailboat) in fleetMap {
-                if (overLine(distance: calcDistanceToLine(sailboat: sailboat))) {
+                if (calcDistanceToLine(sailboat: sailboat) > 0) {
                     sailboat.setStatus(status: Sailboat.raceStatus.over)
                 } else {
                     sailboat.setStatus(status: Sailboat.raceStatus.started)
@@ -227,11 +226,11 @@ class ViewController: UIViewController, UITableViewDataSource {
         let format_string = String(format:"%01i:%02i", min, sec)
         return ((seconds < 1) ? "+" : "-") + format_string
     }
-    
+    /*
     func overLine(distance: Double) -> Bool {
         return (overLineDirection && distance > 0) || (!overLineDirection && distance < 0)
     }
-    
+    */
     func getPinID() -> String? {
         for tracker_id in fleetMap.keys {
             if fleetMap[tracker_id]!.id == "PIN" {
@@ -269,8 +268,6 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     func calcDistanceToLine(sailboat: Sailboat) -> Double {
-        //TODO: reference the boat and pin trackers in a more scalable and concrete way
-        
         //using positions of both pin and committee boat
         /*
         let pos_sail = sailboat.getPosition()
@@ -286,7 +283,6 @@ class ViewController: UIViewController, UITableViewDataSource {
         let den = sqrt(pow((n_pin - n_comm), 2) + pow((e_pin - e_comm), 2))
         return num / den
         */
-        
         //if relative to the committee boat (assuming base tracker is at (0, 0) at line boat end)
         let pos_pin = getPin()!.getPosition()
         let n_pin = pos_pin.getN()
@@ -298,16 +294,13 @@ class ViewController: UIViewController, UITableViewDataSource {
         let pos_sail = sailboat.getPosition()
         let n_sail = pos_sail.getN()
         let e_sail = pos_sail.getE()
-        return ((n_sail * e_pin) - (e_sail * n_pin)) / sqrt(pow(n_pin, 2) + pow(e_pin, 2))
-    }
-    
-    func calcCorrectedDist(dist: Double) -> Double {
+        let dist = ((n_sail * e_pin) - (e_sail * n_pin)) / sqrt(pow(n_pin, 2) + pow(e_pin, 2))
         return (dist == 0) ? 0 : ((overLineDirection) ? dist : -dist)
     }
     
     func runTCPClient() {
         //TODO this should be 192.168.4.1:9000 for real testing
-        let client = TCPClient(address: "192.168.4.1", port: 9000)
+        let client = TCPClient(address: "127.0.0.1", port: 9001)
         switch client.connect(timeout: 1) {
         case .success:
             while true {
@@ -328,13 +321,11 @@ class ViewController: UIViewController, UITableViewDataSource {
                                 } else { //if we're getting data for a boat
                                     let dist_to_line = self.calcDistanceToLine(sailboat: self.fleetMap[clientId]!)
                                     //define the text shown in the table
-                                    let corrected_dist_to_line = calcCorrectedDist(dist: dist_to_line)
-                                    self.tableMap[clientId] = sailboatTableText(clientId: clientId, dist: corrected_dist_to_line)
+                                    self.tableMap[clientId] = sailboatTableText(clientId: clientId, dist: dist_to_line)
                                     //if the race has started
                                     if (seconds <= 0) {
                                         //if a boat that was over has cleared, set its status to indicate this
-                                        if (self.fleetMap[clientId]!.getStatus() == Sailboat.raceStatus.over &&
-                                            !overLine(distance: dist_to_line)) {
+                                        if (self.fleetMap[clientId]!.getStatus() == Sailboat.raceStatus.over && dist_to_line <= 0) {
                                             self.fleetMap[clientId]!.setStatus(status: Sailboat.raceStatus.cleared)
                                         }
                                     }
@@ -364,7 +355,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         resetTimer()
         
         //define the default pin
-        self.fleetMap["Default"] = Sailboat(id: "PIN")
+        self.fleetMap["Default"] = Sailboat(id: "PIN", pos: Position(n: 1.0, e: 1.0))
         pinTableText(clientId: "Default")
         
         //Start the TCP server when the view loads on a separate high time precision thread
