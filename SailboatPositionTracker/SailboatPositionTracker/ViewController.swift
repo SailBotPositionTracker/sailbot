@@ -22,6 +22,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     @IBOutlet weak var pinIDLabel: UILabel!
     @IBOutlet weak var pinELabel: UILabel!
     @IBOutlet weak var pinNLabel: UILabel!
+    @IBOutlet weak var startStopButton: UIButton!
     //true: + distance is over the line, false: - distance is over the line
     var overLineDirection = true
     
@@ -177,8 +178,10 @@ class ViewController: UIViewController, UITableViewDataSource {
     @IBAction func startButtonTapped(_ sender: UIButton) {
         if !isTimerRunning {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
+            startStopButton.backgroundColor = UIColor.red
         } else {
             timer.invalidate()
+            startStopButton.backgroundColor = UIColor.green
         }
         isTimerRunning = !isTimerRunning
     }
