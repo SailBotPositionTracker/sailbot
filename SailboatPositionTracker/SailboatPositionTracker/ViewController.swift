@@ -98,15 +98,21 @@ class ViewController: UIViewController, UITableViewDataSource {
                                style: UIAlertAction.Style.default) { (action: UIAlertAction) in
                                 let clientId = alert.textFields![0].text
                                 if (clientId != "") {
-                                    self.removePin()
-                                    self.fleetMap[clientId!] = Sailboat(id: "PIN")
+                                    //remove old pin and add new pin
+                                    for tracker_id in self.fleetMap.keys {
+                                        if self.fleetMap[tracker_id]!.id == "PIN" {
+                                            self.fleetMap[clientId!] = Sailboat(id: "PIN")
+                                            self.fleetMap.removeValue(forKey: tracker_id)
+                                            break
+                                        }
+                                    }
                                     self.pinTableText(clientId: clientId!)
                                 }
         }
         let cancel = UIAlertAction(title: "Cancel",
                                    style: UIAlertAction.Style.cancel,
                                    handler: nil)
-        alert.addTextField { (textField: UITextField) in textField.placeholder = "Tracker ID" }
+        alert.addTextField { (textField: UITextField) in textField.placeholder = "Tracker ID"; textField.keyboardType = .numberPad }
         alert.addAction(ok)
         alert.addAction(cancel)
         self.present(alert, animated: true, completion: nil)
@@ -150,7 +156,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         let cancel = UIAlertAction(title: "Cancel",
                                    style: UIAlertAction.Style.cancel,
                                    handler: nil)
-        alert.addTextField { (textField: UITextField) in textField.placeholder = "Tracker ID" }
+        alert.addTextField { (textField: UITextField) in textField.placeholder = "Tracker ID"; textField.keyboardType = .numberPad }
         alert.addTextField { (textField: UITextField) in textField.placeholder = "Sail Number" }
         alert.addTextField { (textField: UITextField) in textField.placeholder = "Fleet" }
         alert.addAction(ok)
@@ -225,15 +231,6 @@ class ViewController: UIViewController, UITableViewDataSource {
             return nil
         }
         return fleetMap[pin_id!]
-    }
-    
-    func removePin() {
-        for tracker_id in fleetMap.keys {
-            if fleetMap[tracker_id]!.id == "PIN" {
-                fleetMap.removeValue(forKey: tracker_id)
-                tableMap.removeValue(forKey: tracker_id)
-            }
-        }
     }
     
     func pinTableText(clientId: String) {
