@@ -18,6 +18,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     var timer: Timer = Timer()
     var isTimerRunning: Bool = false
     @IBOutlet weak var timerLabel: UILabel!
+    @IBOutlet weak var infoLabel: UILabel!
     
     @IBOutlet weak var pinIDLabel: UILabel!
     @IBOutlet weak var pinELabel: UILabel!
@@ -107,6 +108,7 @@ class ViewController: UIViewController, UITableViewDataSource {
                                     }
                                     self.fleetMap[clientId!] = Sailboat(id: "PIN")
                                     self.pinTableText(clientId: clientId!)
+                                    self.infoLabel.text = self.infoLabelText()
                                 }
         }
         let cancel = UIAlertAction(title: "Cancel",
@@ -256,6 +258,37 @@ class ViewController: UIViewController, UITableViewDataSource {
         }
     }
     
+    func infoLabelText() -> String {
+        if (getPin() == nil) {
+            return "No pin defined"
+        }
+        if (getPin()!.getPosition() == nil) {
+            return "No pin position data"
+        }
+        if (fleetMap.count == 0) {
+            return "No boats in fleet"
+        }
+        var total_valid = 0
+        var count_over = 0
+        for tracker_id in fleetMap.keys {
+            let tracker = fleetMap[tracker_id]!
+            if tracker.id != "PIN" {
+                let dist_to_line = calcDistanceToLine(sailboat: tracker)
+                if (dist_to_line != nil) {
+                    total_valid += 1
+                    if (dist_to_line! > 0) {
+                        count_over += 1
+                    }
+                }
+            }
+        }
+        if (total_valid == 0) {
+            return "No boat position data"
+        } else {
+            return (NSString(format: "%.0f", (count_over / total_valid)) as String) + "% over"
+        }
+    }
+    
     func calcDistanceToLine(sailboat: Sailboat) -> Double? {
         //if relative to the committee boat (assuming base tracker is at (0, 0) at line boat end)
         let pin = getPin()
@@ -314,6 +347,7 @@ class ViewController: UIViewController, UITableViewDataSource {
                                     let dist_to_line = self.calcDistanceToLine(sailboat: cur_boat!)
                                     //define the text shown in the table
                                     self.tableMap[clientId] = sailboatTableText(clientId: clientId, dist: dist_to_line)
+                                    infoLabel.text = infoLabelText()
                                     //if the race has started
                                     if (seconds <= 0 && dist_to_line != nil) {
                                         //if a boat that was over has cleared, set its status to indicate this
@@ -342,6 +376,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        infoLabel.text = infoLabelText()
         //Set up the table's data source
         tableView.dataSource = self
         resetTimer()
