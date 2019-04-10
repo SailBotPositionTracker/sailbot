@@ -17,9 +17,9 @@ class Sailboat {
     }
     var id: String
     var fleet: String
-    var pos: Position
+    var pos: Position?
     var status: raceStatus
-    init(id: String = "NewSailboat", fleet: String = "", pos: Position = Position(), status: raceStatus = raceStatus.notstarted) {
+    init(id: String = "NewSailboat", fleet: String = "", pos: Position? = nil, status: raceStatus = raceStatus.notstarted) {
         self.id = id
         self.fleet = fleet
         self.pos = pos
@@ -42,7 +42,7 @@ class Sailboat {
         self.fleet = fleet
     }
     
-    func getPosition() -> Position {
+    func getPosition() -> Position? {
         return self.pos
     }
     
