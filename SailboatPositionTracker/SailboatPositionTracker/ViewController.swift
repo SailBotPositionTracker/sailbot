@@ -133,36 +133,37 @@ class ViewController: UIViewController, UITableViewDataSource {
         }
     }
     
-    @IBAction func addBoatTapped(_ sender: UIButton) {
+    @IBAction func addBoatButtonTapped(_ sender: UIButton) {
         let alert = UIAlertController(title: "Add Boat",
                                       message: "Enter your sail number and fleet.",
                                       preferredStyle: UIAlertController.Style.alert)
         let ok = UIAlertAction(title: "OK",
                                style: UIAlertAction.Style.default) { (action: UIAlertAction) in
-                                    let trackerField = alert.textFields![0]
-                                    let sailNumberField = alert.textFields![1]
-                                    let fleetField = alert.textFields![2]
-                                    let clientId = trackerField.text
-                                    //don't allow pin to be reassigned by sailNumber or tracker ID
-                                    if (clientId != "") && (sailNumberField.text != "") && (sailNumberField.text != "PIN") && (fleetField.text != "") && (self.getPinID() != clientId!) {
-                                        self.fleetMap[clientId!] = Sailboat(id: sailNumberField.text!, fleet: fleetField.text!)
-                                        self.tableMap[clientId!] = String(clientId!)
-                                        //reload table data from main thread
-                                        DispatchQueue.main.async {
-                                            self.tableView.reloadData()
-                                        }
+                                let trackerField = alert.textFields![0]
+                                let sailNumberField = alert.textFields![1]
+                                let fleetField = alert.textFields![2]
+                                let clientId = trackerField.text
+                                //don't allow pin to be reassigned by sailNumber or tracker ID
+                                if (clientId != "") && (sailNumberField.text != "") && (sailNumberField.text != "PIN") && (fleetField.text != "") && (self.getPinID() != clientId!) {
+                                    self.fleetMap[clientId!] = Sailboat(id: sailNumberField.text!, fleet: fleetField.text!)
+                                    self.tableMap[clientId!] = String(clientId!)
+                                    //reload table data from main thread
+                                    DispatchQueue.main.async {
+                                        self.tableView.reloadData()
                                     }
+                                }
         }
         let cancel = UIAlertAction(title: "Cancel",
                                    style: UIAlertAction.Style.cancel,
                                    handler: nil)
         alert.addTextField { (textField: UITextField) in textField.placeholder = "Tracker ID"; textField.keyboardType = .numberPad }
-        alert.addTextField { (textField: UITextField) in textField.placeholder = "Sail Number" }
+        alert.addTextField { (textField: UITextField) in textField.placeholder = "Sail Number"; textField.keyboardType = .numberPad }
         alert.addTextField { (textField: UITextField) in textField.placeholder = "Fleet" }
         alert.addAction(ok)
         alert.addAction(cancel)
         self.present(alert, animated: true, completion: nil)
     }
+    
     
     @IBAction func startButtonTapped(_ sender: UIButton) {
         if !isTimerRunning {
