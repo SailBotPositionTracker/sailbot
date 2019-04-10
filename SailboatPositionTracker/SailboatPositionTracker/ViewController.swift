@@ -77,12 +77,13 @@ class ViewController: UIViewController, UITableViewDataSource {
             case Sailboat.raceStatus.over:
                 cell.backgroundColor = UIColor.red
             case Sailboat.raceStatus.notstarted:
-                cell.backgroundColor = UIColor.white
+                cell.backgroundColor = UIColor.black
             case Sailboat.raceStatus.started:
                 cell.backgroundColor = UIColor.green
             case Sailboat.raceStatus.cleared:
                 cell.backgroundColor = UIColor.blue
         }
+        cell.textLabel?.textColor = UIColor.white
         return cell
     }
     
@@ -189,6 +190,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     @IBAction func resetButtonTapped(_ sender: UIButton) {
         timer.invalidate()
         resetTimer()
+        startStopButton.backgroundColor = UIColor.green
     }
     
     @objc func updateTimer() {

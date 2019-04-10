@@ -10,16 +10,38 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    var timer: Timer = Timer()
+    
+    var targetBrightness: Double = 0.0
+    
+    //TODO: check the accuracy of this more closely
+    @objc func updateTimer() {
+        let bright = CGFloat(targetBrightness)
+        if (bright.isLess(than: UIScreen.main.brightness)) {
+            UIScreen.main.brightness -= CGFloat(0.05)
+        } else if (UIScreen.main.brightness.isLess(than: bright)) {
+            UIScreen.main.brightness += CGFloat(0.05)
+        }
+        if abs(UIScreen.main.brightness - bright) <= 0.01 {
+            timer.invalidate()
+        }
+    }
 
     var window: UIWindow?
+    static var defaultBrightness:Double = 0.5;
 
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions:
+        [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        AppDelegate.defaultBrightness = Double(UIScreen.main.brightness)
+        //TODO: sleeping on main thread might not be the best idea
+        Thread.sleep(forTimeInterval: 1.0)
         // Override point for customization after application launch.
         return true
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
+        targetBrightness = AppDelegate.defaultBrightness
+        timer = Timer.scheduledTimer(timeInterval: 0.017, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
     }
@@ -30,10 +52,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
+        AppDelegate.defaultBrightness = Double(UIScreen.main.brightness)
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
+        AppDelegate.defaultBrightness = Double(UIScreen.main.brightness)
+        targetBrightness = 0.999
+        timer = Timer.scheduledTimer(timeInterval: 0.017, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
 
