@@ -30,26 +30,6 @@ class ViewController: UIViewController, UITableViewDataSource {
     var fleetMap = [String: Sailboat]()
     
     //boilerplate for sailboat table section
-    private func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
-        
-        let view = UIView()
-        let label = UILabel()
-        
-        switch section {
-        case 0:
-            label.text="Date"
-        case 1:
-            label.text="Name"
-        case 2:
-            label.text="Amount"
-        default:
-            print()
-        }
-        
-        view.addSubview(label)
-        
-        return view
-    }
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
@@ -76,14 +56,17 @@ class ViewController: UIViewController, UITableViewDataSource {
         switch (status) {
             case Sailboat.raceStatus.over:
                 cell.backgroundColor = UIColor.red
+                cell.textLabel?.textColor = UIColor.black
             case Sailboat.raceStatus.notstarted:
                 cell.backgroundColor = UIColor.black
+                cell.textLabel?.textColor = UIColor.white
             case Sailboat.raceStatus.started:
                 cell.backgroundColor = UIColor.green
+                cell.textLabel?.textColor = UIColor.black
             case Sailboat.raceStatus.cleared:
                 cell.backgroundColor = UIColor.blue
+                cell.textLabel?.textColor = UIColor.black
         }
-        cell.textLabel?.textColor = UIColor.white
         return cell
     }
     
