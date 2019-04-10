@@ -10,7 +10,7 @@ import Foundation
 
 class Sailboat {
     enum raceStatus {
-        case notstarted
+        case none
         case started
         case over
         case cleared
@@ -19,7 +19,7 @@ class Sailboat {
     var fleet: String
     var pos: Position?
     var status: raceStatus
-    init(id: String = "NewSailboat", fleet: String = "", pos: Position? = nil, status: raceStatus = raceStatus.notstarted) {
+    init(id: String = "NewSailboat", fleet: String = "", pos: Position? = nil, status: raceStatus = raceStatus.none) {
         self.id = id
         self.fleet = fleet
         self.pos = pos
