@@ -99,6 +99,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         
         let status = fleetMap[data[indexPath.row].key]!.getStatus()
         //define the table row color for each possible race status
+        cell.textLabel?.font = UIFont (name: "Menlo", size: 20)
         switch (status) {
             case Sailboat.raceStatus.over:
                 cell.backgroundColor = UIColor.red
@@ -291,13 +292,21 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     
     func sailboatTableText(clientId: String, dist: Double?) -> String {
         let sailboat = self.fleetMap[clientId]!
-        let track_id = String(clientId).padding(toLength: 30, withPad: " ", startingAt: 0)
-        let id = sailboat.getId().padding(toLength: 30, withPad: " ", startingAt: 0)
-        let fleet = sailboat.getFleet().padding(toLength: 30, withPad: " ", startingAt: 0)
+        let track_id = String(clientId).padding(toLength: 7, withPad: " ", startingAt: 0)
+        let id = sailboat.getId().padding(toLength: 20, withPad: " ", startingAt: 0)
+        let fleet = sailboat.getFleet().padding(toLength: 16, withPad: " ", startingAt: 0)
         let base_info = track_id + id + fleet
         if (dist != nil) {
-            let dist = ((NSString(format: "%.2f", dist!) as String) as String + "m").padding(toLength: 30, withPad: " ", startingAt: 0)
-            return base_info + dist
+            //max: <-999.99m = 9 chars
+            var dist_formatted = ""
+            if (dist! < -999.99) {
+                dist_formatted = "<-999.99m"
+            } else if (dist! > 999.99) {
+                dist_formatted = ">999.99m "
+            } else {
+                dist_formatted = ((NSString(format: "%.2f", dist!) as String) as String + "m").padding(toLength: 9, withPad: " ", startingAt: 0)
+            }
+            return base_info + dist_formatted
         } else {
             return base_info
         }
