@@ -9,7 +9,7 @@
 import UIKit
 import SwiftSocket
 
-class ViewController: UIViewController, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource {
     @IBOutlet weak var tableView: UITableView!
     private var tableMap = [String: String]()
     
@@ -31,6 +31,49 @@ class ViewController: UIViewController, UITableViewDataSource {
     var fleetMap = [String: Sailboat]()
     var pin: Sailboat?
     var pin_id: String?
+    
+    @IBOutlet weak var picker: UIPickerView!
+    var pickerData: [[String]] = [["0", "1", "2", "3", "4", "5"], ["00", "15", "30", "45"]]
+    
+    //boilerplate for time picker view
+    //number of columns of data
+    func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        return 2
+    }
+    
+    //number of rows of data
+    func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        return pickerData[component].count
+    }
+    
+    //data to return for the row and component (column) that's being passed in
+    func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        return pickerData[component][row]
+    }
+    
+    //width of columns
+    func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        return CGFloat(80.0)
+    }
+    
+    //height of rows
+    func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        return CGFloat(50.0)
+    }
+    
+    //label size
+    func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        var pickerLabel: UILabel? = (view as? UILabel)
+        if pickerLabel == nil {
+            pickerLabel = UILabel()
+            pickerLabel?.font = UIFont (name: (pickerLabel?.font.fontName)!, size: 60)
+            pickerLabel?.textAlignment = .center
+        }
+        pickerLabel?.text = pickerData[component][row]
+        pickerLabel?.textColor = UIColor.white
+        
+        return pickerLabel!
+    }
     
     //boilerplate for sailboat table section
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -169,6 +212,16 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     @IBAction func startButtonTapped(_ sender: UIButton) {
+        if (!self.picker.isHidden) {
+            let min_idx: Int = self.picker.selectedRow(inComponent: 0)
+            let sec_idx: Int = self.picker.selectedRow(inComponent: 1)
+            let min: Int = Int(self.pickerData[0][min_idx])!
+            let sec: Int = Int(self.pickerData[1][sec_idx])!
+            self.timerLength = (60 * min) + sec
+            self.seconds = self.timerLength
+            timerLabel.text = timeString(seconds: seconds)
+            self.picker.isHidden = true
+        }
         if !isTimerRunning {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
             startStopButton.backgroundColor = UIColor.red
@@ -205,6 +258,7 @@ class ViewController: UIViewController, UITableViewDataSource {
     }
     
     func resetTimer() {
+        self.picker.isHidden = false
         seconds = timerLength
         isTimerRunning = false
         timerLabel.text = timeString(seconds: seconds)
@@ -365,6 +419,11 @@ class ViewController: UIViewController, UITableViewDataSource {
     override func viewDidLoad() {
         super.viewDidLoad()
         infoLabel.text = infoLabelText()
+        
+        //Set up the time picker's data source
+        self.picker.delegate = self
+        self.picker.dataSource = self
+        
         //Set up the table's data source
         tableView.dataSource = self
         resetTimer()

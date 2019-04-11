@@ -136,6 +136,11 @@
                                         <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <nil key="highlightedColor"/>
                                     </label>
+                                    <pickerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="jFy-nF-Gon">
+                                        <rect key="frame" x="274" y="0.0" width="221" height="96"/>
+                                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                        <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                    </pickerView>
                                 </subviews>
                                 <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <color key="tintColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -170,6 +175,7 @@
                     <connections>
                         <outlet property="infoLabel" destination="ra8-bY-m3h" id="cgi-0P-TEY"/>
                         <outlet property="leadingC" destination="wNg-X5-96W" id="SoR-6M-60p"/>
+                        <outlet property="picker" destination="jFy-nF-Gon" id="BVO-zL-wuk"/>
                         <outlet property="pinELabel" destination="wx1-E1-lht" id="wcp-h5-g1j"/>
                         <outlet property="pinIDLabel" destination="CSc-T6-qhb" id="hxN-6u-kCj"/>
                         <outlet property="pinNLabel" destination="9R8-PW-kFI" id="5rd-Cc-t7w"/>
