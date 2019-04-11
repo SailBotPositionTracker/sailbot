@@ -193,7 +193,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
                                 //don't allow pin to be reassigned by sailNumber or tracker ID
                                 if (clientId != "") && (sailNumberField.text != "") && (fleetField.text != "") && (self.pin_id != clientId!) {
                                     self.fleetMap[clientId!] = Sailboat(id: sailNumberField.text!, fleet: fleetField.text!)
-                                    self.tableMap[clientId!] = String(clientId!)
+                                    self.tableMap[clientId!] = self.sailboatTableText(clientId: clientId!, dist: nil)
                                     //reload table data from main thread
                                     DispatchQueue.main.async {
                                         self.tableView.reloadData()
@@ -290,10 +290,16 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     }
     
     func sailboatTableText(clientId: String, dist: Double?) -> String {
+        let sailboat = self.fleetMap[clientId]!
+        let track_id = String(clientId).padding(toLength: 30, withPad: " ", startingAt: 0)
+        let id = sailboat.getId().padding(toLength: 30, withPad: " ", startingAt: 0)
+        let fleet = sailboat.getFleet().padding(toLength: 30, withPad: " ", startingAt: 0)
+        let base_info = track_id + id + fleet
         if (dist != nil) {
-            return String(clientId) + ": " + (NSString(format: "%.2f", dist!) as String) as String + "m"
+            let dist = ((NSString(format: "%.2f", dist!) as String) as String + "m").padding(toLength: 30, withPad: " ", startingAt: 0)
+            return base_info + dist
         } else {
-            return String(clientId)
+            return base_info
         }
     }
     
