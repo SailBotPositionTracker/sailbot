@@ -11,7 +11,7 @@ import SwiftSocket
 
 class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDelegate, UIPickerViewDataSource {
     @IBOutlet weak var tableView: UITableView!
-    private var tableMap = [String: String]()
+    private var tableMap: [String] = []
     
     var timerLength: Int = 3
     var seconds: Int = 0
@@ -19,7 +19,6 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     var isTimerRunning: Bool = false
     @IBOutlet weak var timerLabel: UILabel!
     @IBOutlet weak var infoLabel: UILabel!
-    
     @IBOutlet weak var pinIDLabel: UILabel!
     @IBOutlet weak var pinELabel: UILabel!
     @IBOutlet weak var pinNLabel: UILabel!
@@ -32,37 +31,76 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     var pin: Sailboat?
     var pin_id: String?
     
+    //sorting functions
+    var sortType = 0
+    func sorterForDistance(boat1:String, boat2:String) -> Bool {
+        let dist1 = calcDistanceToLine(sailboat: self.fleetMap[boat1]!)
+        let dist2 = calcDistanceToLine(sailboat: self.fleetMap[boat2]!)
+        if (dist1 == nil) && (dist2 == nil) {
+            return boat1 < boat2
+        }
+        if (dist1 == nil) {
+            return true
+        }
+        if (dist2 == nil) {
+            return false
+        }
+        return dist1! < dist2!
+    }
+    @IBAction func sortTableById(_ sender: UIButton) {
+        sortType = 0
+        sortTable()
+        self.tableView.reloadData()
+    }
+    @IBAction func sortTableBySailNumber(_ sender: UIButton) {
+        sortType = 1
+        sortTable()
+        self.tableView.reloadData()
+    }
+    @IBAction func sortTableByFleet(_ sender: UIButton) {
+        sortType = 2
+        sortTable()
+        self.tableView.reloadData()
+    }
+    @IBAction func sortTableByDistance(_ sender: UIButton) {
+        sortType = 3
+        sortTable()
+        self.tableView.reloadData()
+    }
+    func sortTable() {
+        switch(sortType) {
+            case 1: tableMap = tableMap.sorted(by: { self.fleetMap[$0]!.getId() < self.fleetMap[$1]!.getId() })
+            case 2: tableMap = tableMap.sorted(by: { self.fleetMap[$0]!.getFleet() < self.fleetMap[$1]!.getFleet() })
+            case 3: tableMap = tableMap.sorted(by: sorterForDistance)
+            default: tableMap = tableMap.sorted(by: { $0 < $1 })
+        }
+    }
+    
+    //picker functions
     @IBOutlet weak var picker: UIPickerView!
     var pickerData: [[String]] = [["0", "1", "2", "3", "4", "5"], ["00", "15", "30", "45"]]
-    
-    //boilerplate for time picker view
-    //number of columns of data
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
+        //number of columns of data
         return 2
     }
-    
-    //number of rows of data
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
+        //number of rows of data
         return pickerData[component].count
     }
-    
-    //data to return for the row and component (column) that's being passed in
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
+        //data to return for the row and component (column) that's being passed in
         return pickerData[component][row]
     }
-    
-    //width of columns
     func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
+        //width of columns
         return CGFloat(80.0)
     }
-    
-    //height of rows
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
+        //height of rows
         return CGFloat(50.0)
     }
-    
-    //label size
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
+        //label size
         var pickerLabel: UILabel? = (view as? UILabel)
         if pickerLabel == nil {
             pickerLabel = UILabel()
@@ -75,29 +113,27 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         return pickerLabel!
     }
     
-    //boilerplate for sailboat table section
+    //tableview functions
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
     }
-    //delete an element from the table
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        //delete an element from the table
         if editingStyle == .delete {
-            let tableIndex = Array(tableMap.keys)[indexPath.row]
+            let tableIndex = tableMap[indexPath.row]
             fleetMap.removeValue(forKey: tableIndex)
-            tableMap.removeValue(forKey: tableIndex)
+            tableMap.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
         }
     }
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        let data = Array(tableMap.values)
-        return data.count
+        return tableMap.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let data = Array(tableMap)
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellReuseIdentifier")!
-        cell.textLabel?.text = data[indexPath.row].value
+        cell.textLabel?.text = sailboatTableText(clientId: tableMap[indexPath.row])
         
-        let status = fleetMap[data[indexPath.row].key]!.getStatus()
+        let status = fleetMap[tableMap[indexPath.row]]!.getStatus()
         //define the table row color for each possible race status
         cell.textLabel?.font = UIFont (name: "Menlo", size: 20)
         switch (status) {
@@ -117,11 +153,11 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         return cell
     }
     
+    //settings pane functions
     @IBOutlet var ubeView: UIView!
     @IBOutlet var leadingC: NSLayoutConstraint!
     @IBOutlet var trailingC: NSLayoutConstraint!
     var settingsMenuIsVisible = false
-    
     @IBAction func hamburgerBtnTapped(_ sender: Any) {
         if !settingsMenuIsVisible {
             leadingC.constant = 300
@@ -173,9 +209,8 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         //TODO: could interfere with I flag
         if (seconds > 0) {
             overLineDirection = !overLineDirection
-            for (clientId, sailboat) in fleetMap {
-                let dist_to_line = self.calcDistanceToLine(sailboat: sailboat)
-                self.tableMap[clientId] = self.sailboatTableText(clientId: clientId, dist: dist_to_line)
+            if (sortType == 3) {
+                sortTable()
             }
             self.tableView.reloadData()
         }
@@ -194,11 +229,9 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
                                 //don't allow pin to be reassigned by sailNumber or tracker ID
                                 if (clientId != "") && (sailNumberField.text != "") && (fleetField.text != "") && (self.pin_id != clientId!) {
                                     self.fleetMap[clientId!] = Sailboat(id: sailNumberField.text!, fleet: fleetField.text!)
-                                    self.tableMap[clientId!] = self.sailboatTableText(clientId: clientId!, dist: nil)
-                                    //reload table data from main thread
-                                    DispatchQueue.main.async {
-                                        self.tableView.reloadData()
-                                    }
+                                    self.tableMap.append(clientId!)
+                                    self.sortTable()
+                                    self.tableView.reloadData()
                                 }
         }
         let cancel = UIAlertAction(title: "Cancel",
@@ -226,9 +259,11 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         if !isTimerRunning {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
             startStopButton.backgroundColor = UIColor.red
+            startStopButton.setTitle("Stop", for: .normal)
         } else {
             timer.invalidate()
             startStopButton.backgroundColor = UIColor.green
+            startStopButton.setTitle("Start", for: .normal)
         }
         isTimerRunning = !isTimerRunning
     }
@@ -237,6 +272,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         timer.invalidate()
         resetTimer()
         startStopButton.backgroundColor = UIColor.green
+        startStopButton.setTitle("Start", for: .normal)
     }
     
     @objc func updateTimer() {
@@ -290,8 +326,9 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         }
     }
     
-    func sailboatTableText(clientId: String, dist: Double?) -> String {
+    func sailboatTableText(clientId: String) -> String {
         let sailboat = self.fleetMap[clientId]!
+        let dist = calcDistanceToLine(sailboat: sailboat)
         let track_id = String(clientId).padding(toLength: 7, withPad: " ", startingAt: 0)
         let id = sailboat.getId().padding(toLength: 20, withPad: " ", startingAt: 0)
         let fleet = sailboat.getFleet().padding(toLength: 16, withPad: " ", startingAt: 0)
@@ -394,8 +431,6 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
                                 cur_boat!.setPosition(pos: cur_pos)
                                 //if we're getting data for the pin
                                 let dist_to_line = self.calcDistanceToLine(sailboat: cur_boat!)
-                                //define the text shown in the table
-                                self.tableMap[clientId] = sailboatTableText(clientId: clientId, dist: dist_to_line)
                                 infoLabel.text = infoLabelText()
                                 //if the race has started
                                 if (seconds <= 0 && dist_to_line != nil) {
@@ -404,6 +439,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
                                         cur_boat!.setStatus(status: Sailboat.raceStatus.cleared)
                                     }
                                 }
+                                sortTable()
                                 //reload table data from main thread
                                 DispatchQueue.main.async {
                                     self.tableView.reloadData()
@@ -413,6 +449,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
                                 self.pin!.setPosition(pos: cur_pos)
                                 setPinText()
                                 //TODO: reload position for every boat
+                                sortTable()
                                 //reload table data from main thread
                                 DispatchQueue.main.async {
                                     self.tableView.reloadData()
