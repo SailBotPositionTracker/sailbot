@@ -258,6 +258,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         }
         if !isTimerRunning {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
+            RunLoop.current.add(timer, forMode: RunLoop.Mode.common)
             startStopButton.backgroundColor = UIColor.red
             startStopButton.setTitle("Stop", for: .normal)
         } else {
