@@ -31,6 +31,20 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     var pin: Sailboat?
     var pin_id: String?
     
+    @IBOutlet weak var courseSideLabel: UILabel!
+    @IBAction func swapCourseSide(_ sender: Any) {
+        //TODO: could interfere with I flag
+        overLineDirection = !overLineDirection
+        if (sortType == 3) {
+            sortTable()
+        }
+        if (overLineDirection) {
+            courseSideLabel.text = "Course Side: Upwind"
+        } else {
+            courseSideLabel.text = "Course Side: Downwind"
+        }
+        self.tableView.reloadData()
+    }
     //sorting functions
     var sortType = 0
     func sorterForDistance(boat1:String, boat2:String) -> Bool {
@@ -78,7 +92,9 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     
     //picker functions
     @IBOutlet weak var picker: UIPickerView!
+    @IBOutlet weak var pickerColon: UILabel!
     var pickerData: [[String]] = [["0", "1", "2", "3", "4", "5"], ["00", "15", "30", "45"]]
+    
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
         //number of columns of data
         return 2
@@ -112,13 +128,6 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         }
         pickerLabel?.text = pickerData[component][row]
         pickerLabel?.textColor = UIColor.white
-        /*
-        switch (component) {
-        case 0: pickerLabel?.backgroundColor = UIColor.red
-        case 1: pickerLabel?.backgroundColor = UIColor.green
-        default: pickerLabel?.textColor = UIColor.white
-        }
-        */
         
         return pickerLabel!
     }
@@ -170,8 +179,8 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     var settingsMenuIsVisible = false
     @IBAction func hamburgerBtnTapped(_ sender: Any) {
         if !settingsMenuIsVisible {
-            leadingC.constant = 300
-            trailingC.constant = -300
+            leadingC.constant = 350
+            trailingC.constant = -350
         } else {
             leadingC.constant = 0
             trailingC.constant = 0
@@ -214,18 +223,6 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         self.present(alert, animated: true, completion: nil)
     }
     
-    @IBAction func swapLineButtonTapped(_ sender: UIButton) {
-        //only allow line side swaps before the start of the race
-        //TODO: could interfere with I flag
-        if (seconds > 0) {
-            overLineDirection = !overLineDirection
-            if (sortType == 3) {
-                sortTable()
-            }
-            self.tableView.reloadData()
-        }
-    }
-    
     @IBAction func addBoatButtonTapped(_ sender: UIButton) {
         let alert = UIAlertController(title: "Add Boat",
                                       message: "Enter your sail number and fleet.",
@@ -265,6 +262,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
             self.seconds = self.timerLength
             timerLabel.text = timeString(seconds: seconds)
             self.picker.isHidden = true
+            self.pickerColon.isHidden = true
         }
         if !isTimerRunning {
             timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(updateTimer), userInfo: nil, repeats: true)
@@ -307,6 +305,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     
     func resetTimer() {
         self.picker.isHidden = false
+        self.pickerColon.isHidden = false
         seconds = timerLength
         isTimerRunning = false
         timerLabel.text = timeString(seconds: seconds)
