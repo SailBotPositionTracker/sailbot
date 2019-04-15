@@ -13,7 +13,7 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     @IBOutlet weak var tableView: UITableView!
     private var tableMap: [String] = []
     
-    var timerLength: Int = 3
+    var timerLength: Int = 180
     var seconds: Int = 0
     var timer: Timer = Timer()
     var isTimerRunning: Bool = false
@@ -93,22 +93,32 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
     }
     func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
         //width of columns
-        return CGFloat(80.0)
+        switch (component) {
+            case 0: return CGFloat(60.0)
+            default: return CGFloat(100.0)
+        }
     }
     func pickerView(_ pickerView: UIPickerView, rowHeightForComponent component: Int) -> CGFloat {
         //height of rows
-        return CGFloat(50.0)
+        return CGFloat(70.0)
     }
     func pickerView(_ pickerView: UIPickerView, viewForRow row: Int, forComponent component: Int, reusing view: UIView?) -> UIView {
         //label size
         var pickerLabel: UILabel? = (view as? UILabel)
         if pickerLabel == nil {
             pickerLabel = UILabel()
-            pickerLabel?.font = UIFont (name: (pickerLabel?.font.fontName)!, size: 60)
+            pickerLabel?.font = UIFont (name: "Helvetica Neue", size: 76)
             pickerLabel?.textAlignment = .center
         }
         pickerLabel?.text = pickerData[component][row]
         pickerLabel?.textColor = UIColor.white
+        /*
+        switch (component) {
+        case 0: pickerLabel?.backgroundColor = UIColor.red
+        case 1: pickerLabel?.backgroundColor = UIColor.green
+        default: pickerLabel?.textColor = UIColor.white
+        }
+        */
         
         return pickerLabel!
     }
@@ -476,6 +486,10 @@ class ViewController: UIViewController, UITableViewDataSource, UIPickerViewDeleg
         //Set up the time picker's data source
         self.picker.delegate = self
         self.picker.dataSource = self
+        //set timer default to 3:00
+        self.picker.selectRow(3, inComponent: 0, animated: true)
+        self.picker.selectRow(0, inComponent: 1, animated: true)
+        //self.picker.alpha = 1
         
         //Set up the table's data source
         tableView.dataSource = self
